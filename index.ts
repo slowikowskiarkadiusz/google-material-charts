@@ -1,3 +1,3 @@
-import { LineChart } from "./charts/line/line.chart";
+import { LineChart } from "./src/charts/line/line.chart";
 
-new LineChart(document.getElementById('diagram-container')!, 'Line chart!');
+new LineChart(document.getElementById('diagram-container') as HTMLDivElement, 'All Campaigns');
