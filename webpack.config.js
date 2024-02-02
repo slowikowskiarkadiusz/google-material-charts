@@ -1,6 +1,6 @@
+"use strict";
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-
 module.exports = {
     mode: 'development',
     entry: './index.ts', // Entry point of your application
@@ -23,8 +23,8 @@ module.exports = {
                 test: /\.scss$/,
                 use: [
                     'style-loader', // Creates `style` nodes from JS strings
-                    'css-loader',   // Translates CSS into CommonJS
-                    'sass-loader'   // Compiles Sass to CSS
+                    'css-loader', // Translates CSS into CommonJS
+                    'sass-loader' // Compiles Sass to CSS
                 ],
             },
         ],
@@ -51,3 +51,4 @@ module.exports = {
         // },
     }
 };
+//# sourceMappingURL=webpack.config.js.map

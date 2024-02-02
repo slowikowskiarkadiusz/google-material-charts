@@ -21,7 +21,7 @@ export abstract class Chart {
         const legend = this.parent.ownerDocument.createElement('h1');
         legend.classList.add(styles.__chartLegend);
         div.append(legend);
-        
+
         console.log(styles);
     }
 }
