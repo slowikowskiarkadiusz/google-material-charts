@@ -16,15 +16,17 @@ module.exports = {
                 use: 'ts-loader',
                 exclude: /node_modules/,
             },
-            // Define loaders for handling different file types
             {
                 test: /\.js$/,
                 exclude: /node_modules/,
                 use: 'babel-loader', // Example: using Babel for JavaScript
-            },
-            {
-                test: /\.css$/,
-                use: ['style-loader', 'css-loader'], // Example: handling CSS files
+            }, {
+                test: /\.scss$/,
+                use: [
+                    'style-loader', // Creates `style` nodes from JS strings
+                    'css-loader',   // Translates CSS into CommonJS
+                    'sass-loader'   // Compiles Sass to CSS
+                ],
             },
         ],
     },
