@@ -1,17 +1,19 @@
-$font-color: rgb(97, 97, 97);
-$border-color: rgb(224, 224, 224);
+$fontColor: rgb(97, 97, 97);
+$borderColor: rgb(224, 224, 224);
 
 .__chart {
     display: flex;
     flex-direction: column;
     height: 100%;
     width: 100%;
-    color: $font-color;
-    border: 1px $border-color solid;
+    color: $fontColor;
+    border: 1px $borderColor solid;
     font-family: "Roboto", serif;
+    padding: 1em;
+    gap: 1em;
 
     .__chartHeader {
-        margin: 1em;
+        margin: 0;
         font-size: 1.25em;
         font-weight: normal;
     }

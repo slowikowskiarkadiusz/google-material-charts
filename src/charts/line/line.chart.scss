@@ -1,0 +1,16 @@
+@import '../chart';
+
+.horizontalLine {
+    stroke: $borderColor;
+    stroke-width: 0.5;
+}
+
+.horizontalLineLabel {
+    fill: #616164;
+}
+
+.bottomHorizontalLine {
+    @extend .horizontalLine;
+
+    stroke-width: 1;
+}
