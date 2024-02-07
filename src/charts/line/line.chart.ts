@@ -2,14 +2,24 @@ import { Chart, SvgPolygon } from "../chart";
 import lineStyles from './line.chart.scss'
 import { v2d } from "../../v2d";
 
+const defaultConfigs: LineConfig[] = [
+  { color: '#E40303', isDotted: false },
+  { color: '#FF8C00', isDotted: false },
+  { color: '#FFED00', isDotted: false },
+  { color: '#008026', isDotted: false },
+  { color: '#24408E', isDotted: false },
+  { color: '#732982', isDotted: false },
+];
+
 export class LineChart extends Chart {
-  constructor(parent: HTMLDivElement, title: string, data: LineChartData) {
+  constructor(parent: HTMLDivElement, title: string, data: LineChartData, configs?: LineConfig[]) {
     super(parent, title);
 
-    this.render(data);
+    let legendData = this.renderSvg(data, configs ?? defaultConfigs);
+    this.renderLegend(legendData);
   }
 
-  private render(data: LineChartData) {
+  private renderSvg(data: LineChartData, configs: LineConfig[]): LineChartLegendConfig[] {
     const { clientHeight, clientWidth } = this.svg;
     const horizontalLinesGroup = this.parent.ownerDocument.createElementNS(LineChart.svgNS, 'g');
     this.svg.append(horizontalLinesGroup);
@@ -47,32 +57,62 @@ export class LineChart extends Chart {
       horizontalLinesLabelsGroup.append(path, text);
     }
 
-    const lineChartColors: string[] = [
-      '#E40303',
-      '#FF8C00',
-      '#FFED00',
-      '#008026',
-      '#24408E',
-      '#732982',
-    ];
+    const legendData: LineChartLegendConfig[] = [];
     const valuesPolygonsGroup = this.parent.ownerDocument.createElementNS(LineChart.svgNS, 'g');
     makePolygons(data.items, horizontalLinesGroup.getBBox().width, horizontalLinesGroup.getBBox().height, 0, data.items.flatMap(x => x.values).reduce((p, c) => p > c ? p : c), 0)
       .forEach((x, i) => {
-        console.log(x);
         const path = this.parent.ownerDocument.createElementNS(LineChart.svgNS, 'path');
         path.setAttribute('d', x.path);
-        path.setAttribute('stroke', lineChartColors[i]);
+        path.setAttribute('stroke', configs[i].color);
+        if (configs[i].isDotted)
+          path.setAttribute('stroke-dasharray', '7');
         path.setAttribute('stroke-width', '3px');
         path.setAttribute('fill', 'none');
         valuesPolygonsGroup.append(path);
+        legendData.push({
+          label: data.items[i].label,
+          color: configs[i].color,
+          count: data.items[i].values.reduce((p, c) => p + c),
+          isDotted: configs[i].isDotted
+        });
       });
 
     this.svg.append(valuesPolygonsGroup);
+
+    return legendData;
 
     //calosc 720
     //lewy margin 42 - 0.583 - 1/15
     //linia 548 - 137/180 - 13/17
     //linia i text margin 14 - 1/50
+  }
+
+  private renderLegend(configs: LineChartLegendConfig[]) {
+    this.legend.style.display = 'grid';
+    this.legend.style.gridTemplateColumns = 'auto auto';
+
+    configs
+      .forEach(x => {
+        const main = this.legend.ownerDocument.createElement('div');
+        main.style.display = 'grid';
+        main.style.gridTemplateColumns = '1em auto';
+        main.style.gap = '0.5em';
+        this.legend.append(main);
+        const stripParent = this.legend.ownerDocument.createElement('div');
+        stripParent.style.display = 'flex';
+        stripParent.style.justifyContent = 'center';
+        stripParent.style.alignItems = 'center';
+        main.append(stripParent);
+        const strip = this.legend.ownerDocument.createElement('div');
+        strip.style.height = '0.11em';
+        strip.style.width = '100%';
+        strip.style.backgroundColor = x.color;
+        stripParent.append(strip);
+        const label = this.legend.ownerDocument.createElement('span');
+        label.style.fontSize = '0.75em';
+        label.innerText = `${ x.label } (${ x.count })`;
+        main.append(label);
+      });
   }
 }
 
@@ -100,8 +140,7 @@ function makePolygons(items: LineChartItem[], width: number, height: number, off
 }
 
 function createSmoothPath(points: v2d[]): string {
-  // Start the path data with the 'Move to' command for the first point
-  let pathData: string = `M ${points[0].x},${points[0].y} `;
+  let pathData: string = `M ${ points[0].x },${ points[0].y } `;
 
   for (let i = 1; i < points.length - 1; i++) {
     const current = points[i];
@@ -109,18 +148,22 @@ function createSmoothPath(points: v2d[]): string {
     const controlPointX = (current.x + next.x) / 2;
     const controlPointY = (current.y + next.y) / 2;
 
-    pathData += `Q ${current.x},${current.y} ${controlPointX},${controlPointY} `;
+    pathData += `Q ${ current.x },${ current.y } ${ controlPointX },${ controlPointY } `;
   }
 
   // Line to the last point
   if (points.length > 1) {
     const lastPoint = points[points.length - 1];
-    pathData += `L ${lastPoint.x},${lastPoint.y}`;
+    pathData += `L ${ lastPoint.x },${ lastPoint.y }`;
   }
 
   return pathData;
 }
 
+export interface LineConfig {
+  color: string;
+  isDotted: boolean;
+}
 
 export interface LineChartData {
   items: LineChartItem[];
@@ -130,4 +173,11 @@ export interface LineChartData {
 export interface LineChartItem {
   values: number[];
   label: string;
+}
+
+interface LineChartLegendConfig {
+  label: string;
+  color: string;
+  isDotted: boolean;
+  count: number;
 }
