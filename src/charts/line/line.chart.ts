@@ -22,6 +22,7 @@ export class LineChart extends Chart {
   private renderSvg(data: LineChartData, configs: LineConfig[]): LineChartLegendConfig[] {
     const { clientHeight, clientWidth } = this.svg;
     const horizontalLinesGroup = this.parent.ownerDocument.createElementNS(LineChart.svgNS, 'g');
+    // horizontalLinesGroup.setAttribute('transform', `translate(${ horizontalLinesGroup.getBoundingClientRect().x - this.svg.getBoundingClientRect().x }, 10)`);
     this.svg.append(horizontalLinesGroup);
     const horizontalLinesCount = 4;
     // const horizontalLinesBackground = this.parent.ownerDocument.createElementNS(LineChart.svgNS, 'rect');
@@ -39,23 +40,28 @@ export class LineChart extends Chart {
       horizontalLinesGroup.append(line);
     }
 
+    horizontalLinesGroup.setAttribute('transform', 'scale(1, 1)');
+
     const horizontalLinesLabelsGroup = this.parent.ownerDocument.createElementNS(LineChart.svgNS, 'g');
     this.svg.append(horizontalLinesLabelsGroup);
     const horizontalLinesLabelsCount = horizontalLinesGroup.childElementCount;
+    const maxLabel = data.items.flatMap(x => x.values).reduce((p, c) => p > c ? p : c);
     for (let i = 0; i < horizontalLinesLabelsCount; i++) {
       const line = horizontalLinesGroup.children[i] as SVGLineElement;
       const path = this.parent.ownerDocument.createElementNS(LineChart.svgNS, 'path');
-      path.setAttribute('d', `M${ line.x2.animVal.value + this.svg.clientWidth * 0.05 },${ line.y1.animVal.value } L${ line.x2.animVal.value + this.svg.clientWidth * 0.15 },${ line.y1.animVal.value }`);
+      path.setAttribute('d', `M${ line.x2.animVal.value + this.svg.clientWidth * 0.05 },${ line.y1.animVal.value } L${ line.x2.animVal.value + this.svg.clientWidth * 0.5 },${ line.y1.animVal.value }`);
       const id = `horizontalLine${ i }`;
       path.setAttribute('id', id);
       const text = this.parent.ownerDocument.createElementNS(LineChart.svgNS, 'text');
       const textPath = this.parent.ownerDocument.createElementNS(LineChart.svgNS, 'textPath');
       textPath.setAttribute('href', `#${ id }`);
       textPath.classList.add(lineStyles.horizontalLineLabel);
-      textPath.innerHTML = 'abc';
+      textPath.innerHTML = `${ maxLabel - maxLabel * (i) / 4 }`;
       text.append(textPath);
       horizontalLinesLabelsGroup.append(path, text);
     }
+
+    horizontalLinesLabelsGroup.setAttribute('transform', `translate(0, ${ this.svg.computedStyleMap().get('font-size')!.toString().replace('px', '') }) scale(1, 1)`);
 
     const legendData: LineChartLegendConfig[] = [];
     const valuesPolygonsGroup = this.parent.ownerDocument.createElementNS(LineChart.svgNS, 'g');
@@ -77,6 +83,8 @@ export class LineChart extends Chart {
         });
       });
 
+    valuesPolygonsGroup.setAttribute('transform', 'scale(1, 1)');
+
     this.svg.append(valuesPolygonsGroup);
 
     return legendData;
@@ -90,6 +98,7 @@ export class LineChart extends Chart {
   private renderLegend(configs: LineChartLegendConfig[]) {
     this.legend.style.display = 'grid';
     this.legend.style.gridTemplateColumns = 'auto auto';
+    this.legend.style.gap = '0.5em';
 
     configs
       .forEach(x => {

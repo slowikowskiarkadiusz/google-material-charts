@@ -16,7 +16,7 @@ export abstract class Chart {
     parent.append(header);
 
     this.svg = document.createElementNS(Chart.svgNS, "svg");
-    this.svg.setAttribute("viewBox", `0 0 ${ this.parent.clientWidth } ${ this.parent.clientHeight }`);
+    this.svg.setAttribute("viewBox", `70 0 ${ this.parent.clientWidth * 0.8 } ${ this.parent.clientHeight * 0.8 }`);
     this.svg.classList.add(styles.__chartContent);
     parent.append(this.svg);
 
