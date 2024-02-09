@@ -12,28 +12,29 @@ const defaultConfigs: LineConfig[] = [
 ];
 
 export class LineChart extends Chart {
-  constructor(parent: HTMLDivElement, title: string, data: LineChartData, configs?: LineConfig[]) {
-    super(parent, title);
+  private static instance = 0;
 
-    let legendData = this.renderSvg(data, configs ?? defaultConfigs);
-    this.renderLegend(legendData);
+  constructor(parent: HTMLDivElement, title: string, data: LineChartData, configs?: LineConfig[]) {
+    LineChart.instance++;
+    super(parent, title);
+    const fontSize = parseInt(this.svg.computedStyleMap().get('font-size')!.toString().replace('px', ''));
+
+    const lineConfigs = configs ?? defaultConfigs;
+    this.renderLegend(data, lineConfigs);
+    this.svg.setAttribute("viewBox", `0 0 ${ this.svg.clientWidth } ${ this.svg.clientHeight + fontSize }`)
+    this.renderSvg(data, lineConfigs, fontSize);
   }
 
-  private renderSvg(data: LineChartData, configs: LineConfig[]): LineChartLegendConfig[] {
+  private renderSvg(data: LineChartData, configs: LineConfig[], fontSize: number) {
     const { clientHeight, clientWidth } = this.svg;
     const horizontalLinesGroup = this.parent.ownerDocument.createElementNS(LineChart.svgNS, 'g');
-    // horizontalLinesGroup.setAttribute('transform', `translate(${ horizontalLinesGroup.getBoundingClientRect().x - this.svg.getBoundingClientRect().x }, 10)`);
     this.svg.append(horizontalLinesGroup);
+    const longestValueLength = data.items.flatMap(x => x.values).reduce((p, c) => p > c ? p : c).toString().length;
     const horizontalLinesCount = 4;
-    // const horizontalLinesBackground = this.parent.ownerDocument.createElementNS(LineChart.svgNS, 'rect');
-    // horizontalLinesGroup.append(horizontalLinesBackground);
-    // horizontalLinesBackground.setAttribute('width', `${ clientWidth }`);
-    // horizontalLinesBackground.setAttribute('height', `${ clientHeight }`);
-    // horizontalLinesBackground.setAttribute('fill', `red`);
     for (let i = 0; i <= horizontalLinesCount; i++) {
       const line = this.parent.ownerDocument.createElementNS(LineChart.svgNS, 'line');
       line.setAttribute('x1', `${ 0 }`);
-      line.setAttribute('x2', `${ clientWidth }`);
+      line.setAttribute('x2', `${ clientWidth - fontSize * longestValueLength }`);
       line.setAttribute('y1', `${ clientHeight * (i) / 4 }`);
       line.setAttribute('y2', `${ clientHeight * (i) / 4 }`);
       line.classList.add(i === horizontalLinesCount ? lineStyles.bottomHorizontalLine : lineStyles.horizontalLine);
@@ -50,20 +51,19 @@ export class LineChart extends Chart {
       const line = horizontalLinesGroup.children[i] as SVGLineElement;
       const path = this.parent.ownerDocument.createElementNS(LineChart.svgNS, 'path');
       path.setAttribute('d', `M${ line.x2.animVal.value + this.svg.clientWidth * 0.05 },${ line.y1.animVal.value } L${ line.x2.animVal.value + this.svg.clientWidth * 0.5 },${ line.y1.animVal.value }`);
-      const id = `horizontalLine${ i }`;
+      const id = `horizontalLine${ LineChart.instance }${ i }`;
       path.setAttribute('id', id);
       const text = this.parent.ownerDocument.createElementNS(LineChart.svgNS, 'text');
       const textPath = this.parent.ownerDocument.createElementNS(LineChart.svgNS, 'textPath');
       textPath.setAttribute('href', `#${ id }`);
       textPath.classList.add(lineStyles.horizontalLineLabel);
-      textPath.innerHTML = `${ maxLabel - maxLabel * (i) / 4 }`;
+      textPath.innerHTML = `${ Math.floor(maxLabel - maxLabel * (i) / 4) }`;
       text.append(textPath);
       horizontalLinesLabelsGroup.append(path, text);
     }
 
-    horizontalLinesLabelsGroup.setAttribute('transform', `translate(0, ${ this.svg.computedStyleMap().get('font-size')!.toString().replace('px', '') }) scale(1, 1)`);
+    horizontalLinesLabelsGroup.setAttribute('transform', `translate(0, ${ fontSize }) scale(1, 1)`);
 
-    const legendData: LineChartLegendConfig[] = [];
     const valuesPolygonsGroup = this.parent.ownerDocument.createElementNS(LineChart.svgNS, 'g');
     makePolygons(data.items, horizontalLinesGroup.getBBox().width, horizontalLinesGroup.getBBox().height, 0, data.items.flatMap(x => x.values).reduce((p, c) => p > c ? p : c), 0)
       .forEach((x, i) => {
@@ -75,19 +75,11 @@ export class LineChart extends Chart {
         path.setAttribute('stroke-width', '3px');
         path.setAttribute('fill', 'none');
         valuesPolygonsGroup.append(path);
-        legendData.push({
-          label: data.items[i].label,
-          color: configs[i].color,
-          count: data.items[i].values.reduce((p, c) => p + c),
-          isDotted: configs[i].isDotted
-        });
       });
 
     valuesPolygonsGroup.setAttribute('transform', 'scale(1, 1)');
 
     this.svg.append(valuesPolygonsGroup);
-
-    return legendData;
 
     //calosc 720
     //lewy margin 42 - 0.583 - 1/15
@@ -95,12 +87,22 @@ export class LineChart extends Chart {
     //linia i text margin 14 - 1/50
   }
 
-  private renderLegend(configs: LineChartLegendConfig[]) {
+  private renderLegend(data: LineChartData, lineConfigs: LineConfig[]) {
+    const legendData: LineChartLegendConfig[] = data.items.map((dataItem, i) => {
+      return {
+        label: dataItem.label,
+        color: lineConfigs[i].color,
+        count: dataItem.values.reduce((p, c) => p + c),
+        isDotted: lineConfigs[i].isDotted
+      }
+    });
+
+    this.legend.innerHTML = '';
     this.legend.style.display = 'grid';
     this.legend.style.gridTemplateColumns = 'auto auto';
     this.legend.style.gap = '0.5em';
 
-    configs
+    legendData
       .forEach(x => {
         const main = this.legend.ownerDocument.createElement('div');
         main.style.display = 'grid';
