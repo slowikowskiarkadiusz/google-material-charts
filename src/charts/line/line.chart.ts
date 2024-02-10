@@ -72,7 +72,7 @@ export class LineChart extends Chart {
         path.setAttribute('stroke', configs[i].color);
         if (configs[i].isDotted)
           path.setAttribute('stroke-dasharray', '7');
-        path.setAttribute('stroke-width', '3px');
+        path.setAttribute('stroke-width', '2');
         path.setAttribute('fill', 'none');
         valuesPolygonsGroup.append(path);
       });
@@ -80,11 +80,6 @@ export class LineChart extends Chart {
     valuesPolygonsGroup.setAttribute('transform', 'scale(1, 1)');
 
     this.svg.append(valuesPolygonsGroup);
-
-    //calosc 720
-    //lewy margin 42 - 0.583 - 1/15
-    //linia 548 - 137/180 - 13/17
-    //linia i text margin 14 - 1/50
   }
 
   private renderLegend(data: LineChartData, lineConfigs: LineConfig[]) {
