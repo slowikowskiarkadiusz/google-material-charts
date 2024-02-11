@@ -5,6 +5,12 @@
     stroke-width: 1;
 }
 
+.verticalLine {
+    stroke: $borderColor;
+    stroke-width: 1;
+    stroke-dasharray: 5;
+}
+
 .horizontalLineLabel {
     fill: #616164;
 }
@@ -13,4 +19,10 @@
     @extend .horizontalLine;
 
     stroke-width: 1;
+}
+
+.group {
+    * {
+        pointer-events: none;
+    }
 }
