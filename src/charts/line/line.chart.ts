@@ -12,25 +12,40 @@ const defaultConfigs: LineConfig[] = [
   { color: '#732982', isDotted: false },
 ];
 
+const vertexDotRadius = '4';
+const closestVertexDotRadius = '6';
+
 export class LineChart extends Chart {
   private static instance = 0;
   private verticalLines!: SvgLine[];
   private mouseVerticalLine?: SVGLineElement;
+  private vertices: v2d[][] = [];
+  private dots?: SVGCircleElement[];
+  private backgroundDot?: SVGCircleElement;
 
   constructor(parent: HTMLDivElement, title: string, data: LineChartData, configs?: LineConfig[]) {
     LineChart.instance++;
     super(parent, title);
-    const fontSize = parseInt(this.svg.computedStyleMap().get('font-size')!.toString().replace('px', ''));
 
-    const lineConfigs = configs ?? defaultConfigs;
-    this.renderLegend(data, lineConfigs);
-    this.svg.setAttribute("viewBox", `0 0 ${ this.svg.clientWidth } ${ this.svg.clientHeight + fontSize }`)
-    this.renderSvg(data, lineConfigs, fontSize);
-    this.svg.classList.remove(styles.chartContent);
+    const originalHeight = this.svg.clientHeight;
+
+    setTimeout(() => {
+      const fontSize = parseInt(this.svg.computedStyleMap().get('font-size')!.toString().replace('px', ''));
+      const lineConfigs = configs ?? defaultConfigs;
+      this.renderLegend(data, lineConfigs);
+      // this.svg.setAttribute("viewBox", `0 0 ${ this.svg.clientWidth } ${ this.svg.clientHeight + 2 * fontSize }`)
+      this.renderSvg(data, lineConfigs, fontSize);
+      this.svg.classList.remove(styles.chartContent);
+      this.svg.style.overflow = 'visible';
+    }, 0);
   }
 
   private renderSvg(data: LineChartData, configs: LineConfig[], fontSize: number) {
     const { clientHeight, clientWidth } = this.svg;
+    const spaceForChart = clientHeight - 2 * fontSize;
+    const chartScale = spaceForChart / clientHeight;
+    const scaledHeight = clientHeight * chartScale;
+    
     const horizontalLinesGroup = this.parent.ownerDocument.createElementNS(LineChart.svgNS, 'g');
     this.svg.append(horizontalLinesGroup);
     const longestValueLength = data.items.flatMap(x => x.values).reduce((p, c) => p > c ? p : c).toString().length;
@@ -39,19 +54,48 @@ export class LineChart extends Chart {
       const line = this.parent.ownerDocument.createElementNS(LineChart.svgNS, 'line');
       line.setAttribute('x1', `${ 0 }`);
       line.setAttribute('x2', `${ clientWidth - fontSize * longestValueLength }`);
-      line.setAttribute('y1', `${ clientHeight * (i) / 4 }`);
-      line.setAttribute('y2', `${ clientHeight * (i) / 4 }`);
+      line.setAttribute('y1', `${ (scaledHeight) * (i) / 4 }`);
+      line.setAttribute('y2', `${ (scaledHeight) * (i) / 4 }`);
       line.classList.add(i === horizontalLinesCount ? lineStyles.bottomHorizontalLine : lineStyles.horizontalLine);
       horizontalLinesGroup.append(line);
     }
 
-    this.addBubbleEvents(horizontalLinesGroup);
+    const leftText = this.parent.ownerDocument.createElementNS(LineChart.svgNS, 'text');
+    leftText.textContent = data.dates[0];
+    leftText.classList.add(lineStyles.horizontalLineLabel);
+    leftText.setAttribute('x', '0');
+    leftText.setAttribute('y', `${ (scaledHeight) + 2 * fontSize }`);
+    const leftLine = this.parent.ownerDocument.createElementNS(LineChart.svgNS, 'line');
+    leftLine.setAttribute('x1', '1');
+    leftLine.setAttribute('x2', '1');
+    leftLine.setAttribute('y1', `${ (scaledHeight) }`);
+    leftLine.setAttribute('y2', `${ (scaledHeight) + fontSize / 3 }`);
+    leftLine.classList.add(lineStyles.bottomHorizontalLine);
+    this.svg.append(leftText, leftLine);
+
+    const rightText = this.parent.ownerDocument.createElementNS(LineChart.svgNS, 'text');
+    rightText.classList.add(lineStyles.horizontalLineLabel);
+    rightText.textContent = data.dates[data.dates.length - 1];
+    const rightLine = this.parent.ownerDocument.createElementNS(LineChart.svgNS, 'line');
+    setTimeout(() => {
+      const x = clientWidth - fontSize * longestValueLength;
+      rightText.setAttribute('x', `${ x - rightText.getComputedTextLength().valueOf() }`);
+      rightText.setAttribute('y', `${ (scaledHeight) + fontSize }`);
+      rightLine.setAttribute('x1', `${ x - 1 }`);
+      rightLine.setAttribute('x2', `${ x - 1 }`);
+      rightLine.setAttribute('y1', `${ (scaledHeight) }`);
+      rightLine.setAttribute('y2', `${ (scaledHeight) + fontSize / 3 }`);
+      rightLine.classList.add(lineStyles.bottomHorizontalLine);
+    }, 0);
+    this.svg.append(rightText, rightLine);
+
+    this.addBubbleEvents(horizontalLinesGroup, data, configs);
     horizontalLinesGroup.classList.add(lineStyles.group);
     horizontalLinesGroup.style.pointerEvents = 'bounding-box';
     const eventRect = this.parent.ownerDocument.createElementNS(LineChart.svgNS, 'rect');
     setTimeout(() => {
       eventRect.setAttribute('width', (clientWidth - fontSize * longestValueLength).toString())
-      eventRect.setAttribute('height', clientHeight.toString());
+      eventRect.setAttribute('height', (scaledHeight).toString());
       eventRect.setAttribute('fill', 'transparent');
       eventRect.style.pointerEvents = 'bounding-box';
       horizontalLinesGroup.append(eventRect);
@@ -80,7 +124,8 @@ export class LineChart extends Chart {
     horizontalLinesLabelsGroup.classList.add(lineStyles.group);
 
     const valuesPolygonsGroup = this.parent.ownerDocument.createElementNS(LineChart.svgNS, 'g');
-    makePolygons(data.items, horizontalLinesGroup.getBBox().width, horizontalLinesGroup.getBBox().height, 0, data.items.flatMap(x => x.values).reduce((p, c) => p > c ? p : c), 0)
+    const polygonsData = makePolygons(data.items, horizontalLinesGroup.getBBox().width, horizontalLinesGroup.getBBox().height, 0, data.items.flatMap(x => x.values).reduce((p, c) => p > c ? p : c), 0);
+    polygonsData
       .forEach((x, i) => {
         const path = this.parent.ownerDocument.createElementNS(LineChart.svgNS, 'path');
         path.setAttribute('d', x.path);
@@ -91,6 +136,7 @@ export class LineChart extends Chart {
         path.setAttribute('fill', 'none');
         valuesPolygonsGroup.append(path);
       });
+    this.vertices = polygonsData.map(x => x.vertices.map(y => new v2d(y.x, y.y)));
 
     this.svg.append(valuesPolygonsGroup);
     valuesPolygonsGroup.classList.add(lineStyles.group);
@@ -137,48 +183,110 @@ export class LineChart extends Chart {
     });
   }
 
-  private addBubbleEvents(eventParent: SVGElement) {
+  private addBubbleEvents(eventParent: SVGElement, data: LineChartData, configs: LineConfig[]) {
     eventParent.style.pointerEvents = 'all';
     eventParent.addEventListener('mouseover', (e: MouseEvent) => {
       this.bubble?.remove();
       this.bubble = this.parent.ownerDocument.createElement('div');
-      this.bubble.innerText = 'abc';
       this.bubble.classList.add(styles.bubble);
       this.parent.append(this.bubble);
+      // this.bubble.style.transition = 'all 0.1s';
+
+      this.backgroundDot = eventParent.ownerDocument.createElementNS(LineChart.svgNS, 'circle');
+      this.backgroundDot.setAttribute('r', '12');
+      this.backgroundDot.style.pointerEvents = 'none';
+      this.backgroundDot.style.opacity = '0.5';
+      this.svg.append(this.backgroundDot);
     });
 
     eventParent.addEventListener('mousemove', (e: MouseEvent) => {
-      if (this.bubble) {
-        const clientRect = eventParent.getBoundingClientRect();
-        let mousePos = {
-          x: e.x - clientRect.x,
-          y: e.y - clientRect.y,
-        };
+      const clientRect = eventParent.getBoundingClientRect();
+      let mousePos = new v2d(e.x - clientRect.x, e.y - clientRect.y);
 
-        if (this.verticalLines?.length > 0) {
-          let closestVerticalLine = this.verticalLines.reduce((p, c) => Math.abs(c.x1 - mousePos.x) < Math.abs(p.x1 - mousePos.x) ? c : p);
-          this.mouseVerticalLine?.remove();
-          this.mouseVerticalLine = this.svg.ownerDocument.createElementNS(LineChart.svgNS, 'line');
-          this.mouseVerticalLine.style.pointerEvents = 'none';
-          this.svg.append(this.mouseVerticalLine);
-          this.mouseVerticalLine.classList.add(lineStyles.verticalLine);
-          this.mouseVerticalLine.setAttribute('x1', closestVerticalLine.x1.toString());
-          this.mouseVerticalLine.setAttribute('y1', closestVerticalLine.y1.toString());
-          this.mouseVerticalLine.setAttribute('x2', closestVerticalLine.x2.toString());
-          this.mouseVerticalLine.setAttribute('y2', closestVerticalLine.y2.toString());
-          this.mouseVerticalLine.parentElement?.insertBefore(this.mouseVerticalLine, this.mouseVerticalLine.parentElement.firstChild);
+      if (this.verticalLines?.length > 0) {
+        const closestVerticalLine = this.verticalLines.reduce((p, c) => Math.abs(c.x1 - mousePos.x) < Math.abs(p.x1 - mousePos.x) ? c : p);
+        const indexOfTheClosestLine = this.verticalLines.findIndex(v => v.y1 === closestVerticalLine.y1 && v.x1 === closestVerticalLine.x1 && v.y2 === closestVerticalLine.y2 && v.x2 === closestVerticalLine.x2);
+        this.mouseVerticalLine?.remove();
+        this.mouseVerticalLine = this.svg.ownerDocument.createElementNS(LineChart.svgNS, 'line');
+        this.mouseVerticalLine.style.pointerEvents = 'none';
+        this.svg.append(this.mouseVerticalLine);
+        this.mouseVerticalLine.classList.add(lineStyles.verticalLine);
+        this.mouseVerticalLine.setAttribute('x1', closestVerticalLine.x1.toString());
+        this.mouseVerticalLine.setAttribute('y1', closestVerticalLine.y1.toString());
+        this.mouseVerticalLine.setAttribute('x2', closestVerticalLine.x2.toString());
+        this.mouseVerticalLine.setAttribute('y2', closestVerticalLine.y2.toString());
+        this.mouseVerticalLine.parentElement?.insertBefore(this.mouseVerticalLine, this.mouseVerticalLine.parentElement.firstChild);
+
+        this.dots ??= data.items.map((x, i) => {
+          const dot = eventParent.ownerDocument.createElementNS(LineChart.svgNS, 'circle');
+          dot.setAttribute('fill', configs[i].color);
+          dot.setAttribute('r', vertexDotRadius);
+          dot.style.pointerEvents = 'none';
+          // dot.style.transition = 'all 0.1s';
+          this.svg.append(dot);
+          return dot;
+        });
+
+        let closestDot = this.dots[0];
+        let closestDotDistance = Number.MAX_VALUE;
+        let closestDotIndex = 0;
+        this.dots.forEach((dot, i) => {
+          const vertex = this.vertices[i][indexOfTheClosestLine];
+          dot.setAttribute('cx', vertex.x.toString());
+          dot.setAttribute('cy', vertex.y.toString());
+
+          const currDistance = Math.abs(mousePos.y - dot.cy.animVal.value);
+          if (closestDotDistance > currDistance) {
+            closestDot = dot;
+            closestDotDistance = currDistance;
+            closestDotIndex = i;
+          }
+        });
+
+        this.dots.forEach((dot, i) => {
+          dot.setAttribute('r', vertexDotRadius);
+          dot.setAttribute('fill', configs[i].color);
+          dot.removeAttribute('stroke-width');
+          dot.removeAttribute('stroke');
+        });
+        closestDot.setAttribute('r', closestVertexDotRadius);
+        closestDot.setAttribute('stroke', configs[closestDotIndex].color)
+        closestDot.setAttribute('fill', 'white');
+        closestDot.setAttribute('stroke-width', '2');
+        this.svg.append(closestDot);
+
+        if (this.backgroundDot) {
+          this.backgroundDot.setAttribute('fill', configs[closestDotIndex].color);
+          this.backgroundDot.setAttribute('cx', closestDot.cx.animVal.valueAsString);
+          this.backgroundDot.setAttribute('cy', closestDot.cy.animVal.valueAsString);
         }
 
+        if (this.bubble) {
+          const valueSpan = eventParent.ownerDocument.createElement('div');
+          valueSpan.style.textAlign = 'center';
+          valueSpan.innerHTML = `<b>${ data.items[closestDotIndex].values[indexOfTheClosestLine].toString() }</b><div style="font-size: 0.75em">${ data.dates[indexOfTheClosestLine] }</div>`;
+          this.bubble.replaceChildren(valueSpan);
 
-        // const bounds = this.bubble.getBoundingClientRect();
-        // this.bubble!.style.top = `${ e.pageY - bounds.height - 10 }px`;
-        // this.bubble!.style.left = `${ e.pageX - bounds.width / 2 }px`;
+          const newPos = {
+            x: closestDot.cx.animVal.value - this.bubble.offsetWidth / 2,
+            y: closestDot.cy.animVal.value - this.bubble.offsetHeight / 2 - 15,
+          }
+          this.bubble.style.transform = `translate(${ newPos.x }px, ${ newPos.y }px)`;
+        }
       }
     });
 
     eventParent.addEventListener('mouseleave', (e: MouseEvent) => {
       this.mouseVerticalLine?.remove();
+
       this.bubble?.remove();
+      this.bubble = undefined;
+
+      this.backgroundDot?.remove();
+      this.backgroundDot = undefined;
+
+      this.dots?.forEach(dot => dot.remove());
+      this.dots = undefined;
     });
   }
 }

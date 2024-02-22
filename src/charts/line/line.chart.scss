@@ -8,17 +8,18 @@
 .verticalLine {
     stroke: $borderColor;
     stroke-width: 1;
-    stroke-dasharray: 5;
+    stroke-dasharray: 2;
 }
 
 .horizontalLineLabel {
     fill: #616164;
+    font-size: 0.75em;
 }
 
 .bottomHorizontalLine {
     @extend .horizontalLine;
 
-    stroke-width: 1;
+    stroke-width: 2;
 }
 
 .group {

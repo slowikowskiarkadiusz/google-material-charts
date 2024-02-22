@@ -27,15 +27,17 @@ $borderColor: rgb(224, 224, 224);
         height: min-content;
         min-height: min-content;
     }
-    
+
     .bubble {
         pointer-events: none;
         position: absolute;
         background-color: white;
         padding: 1em;
+        display: block;;
         box-shadow: 0 2px 10px 0px #b2b2b2;
         //border: 1px black solid;
         border-radius: 0.25em;
+        transform-origin: bottom center;
     }
 
     .bubble::after {
