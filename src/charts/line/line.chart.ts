@@ -17,6 +17,7 @@ const closestVertexDotRadius = '6';
 
 export class LineChart extends Chart {
   private static instance = 0;
+  private readonly currentInstance: number = -1;
   private verticalLines!: SvgLine[];
   private mouseVerticalLine?: SVGLineElement;
   private vertices: v2d[][] = [];
@@ -24,8 +25,8 @@ export class LineChart extends Chart {
   private backgroundDot?: SVGCircleElement;
 
   constructor(parent: HTMLDivElement, title: string, data: LineChartData, configs?: LineConfig[]) {
-    LineChart.instance++;
     super(parent, title);
+    this.currentInstance = LineChart.instance++;
 
     const originalHeight = this.svg.clientHeight;
 
@@ -45,7 +46,7 @@ export class LineChart extends Chart {
     const spaceForChart = clientHeight - 2 * fontSize;
     const chartScale = spaceForChart / clientHeight;
     const scaledHeight = clientHeight * chartScale;
-    
+
     const horizontalLinesGroup = this.parent.ownerDocument.createElementNS(LineChart.svgNS, 'g');
     this.svg.append(horizontalLinesGroup);
     const longestValueLength = data.items.flatMap(x => x.values).reduce((p, c) => p > c ? p : c).toString().length;
@@ -64,7 +65,7 @@ export class LineChart extends Chart {
     leftText.textContent = data.dates[0];
     leftText.classList.add(lineStyles.horizontalLineLabel);
     leftText.setAttribute('x', '0');
-    leftText.setAttribute('y', `${ (scaledHeight) + 2 * fontSize }`);
+    leftText.setAttribute('y', `${ (scaledHeight) + 1.5 * fontSize }`);
     const leftLine = this.parent.ownerDocument.createElementNS(LineChart.svgNS, 'line');
     leftLine.setAttribute('x1', '1');
     leftLine.setAttribute('x2', '1');
@@ -80,14 +81,30 @@ export class LineChart extends Chart {
     setTimeout(() => {
       const x = clientWidth - fontSize * longestValueLength;
       rightText.setAttribute('x', `${ x - rightText.getComputedTextLength().valueOf() }`);
-      rightText.setAttribute('y', `${ (scaledHeight) + fontSize }`);
+      rightText.setAttribute('y', `${ (scaledHeight) + 1.5 * fontSize }`);
       rightLine.setAttribute('x1', `${ x - 1 }`);
       rightLine.setAttribute('x2', `${ x - 1 }`);
       rightLine.setAttribute('y1', `${ (scaledHeight) }`);
       rightLine.setAttribute('y2', `${ (scaledHeight) + fontSize / 3 }`);
       rightLine.classList.add(lineStyles.bottomHorizontalLine);
+
+      this.putLabels(data.dates, scaledHeight + 1.5 * fontSize, [0, clientWidth - fontSize * longestValueLength]);
     }, 0);
     this.svg.append(rightText, rightLine);
+
+    const totalTextSpace = clientWidth - leftText.getComputedTextLength().valueOf() - rightText.getComputedTextLength().valueOf();
+
+    // [leftText, rightText].map(x => x.getComputedTextLength().valueOf())
+
+    // if (data.dates.length % 2 === 1) {
+    //   let i = Math.floor(data.dates.length / 2);
+    //   const middleText = this.parent.ownerDocument.createElementNS(LineChart.svgNS, 'text');
+    //   middleText.classList.add(lineStyles.horizontalLineLabel);
+    //   middleText.textContent = data.dates[data.dates.length - 1];
+    //   middleText.setAttribute('x', `${ x - middleText.getComputedTextLength().valueOf() }`);
+    //   middleText.setAttribute('y', `${ (scaledHeight) + 1.5 * fontSize }`);
+    // }
+
 
     this.addBubbleEvents(horizontalLinesGroup, data, configs);
     horizontalLinesGroup.classList.add(lineStyles.group);
@@ -109,7 +126,7 @@ export class LineChart extends Chart {
       const line = horizontalLinesGroup.children[i] as SVGLineElement;
       const path = this.parent.ownerDocument.createElementNS(LineChart.svgNS, 'path');
       path.setAttribute('d', `M${ line.x2.animVal.value + this.svg.clientWidth * 0.05 },${ line.y1.animVal.value } L${ line.x2.animVal.value + this.svg.clientWidth * 0.5 },${ line.y1.animVal.value }`);
-      const id = `horizontalLine${ LineChart.instance }${ i }`;
+      const id = `horizontalLine${ this.currentInstance }${ i }`;
       path.setAttribute('id', id);
       const text = this.parent.ownerDocument.createElementNS(LineChart.svgNS, 'text');
       const textPath = this.parent.ownerDocument.createElementNS(LineChart.svgNS, 'textPath');
@@ -288,6 +305,37 @@ export class LineChart extends Chart {
       this.dots?.forEach(dot => dot.remove());
       this.dots = undefined;
     });
+  }
+
+  // currentTextWidths: number[], isFar: [boolean, boolean]
+  private putLabels(dates: string[], y: number, xRange: [number, number]) {
+    const i = Math.floor(dates.length / 2);
+
+    if (dates.length % 2 === 1) {
+      const newText = this.parent.ownerDocument.createElementNS(LineChart.svgNS, 'text');
+      newText.classList.add(lineStyles.horizontalLineLabel);
+      newText.textContent = dates[i];
+      setTimeout(() => {
+        const newTextLength = newText.getComputedTextLength().valueOf();
+        newText.setAttribute('x', `${ (xRange[1] - xRange[0]) / 2 + xRange[0] }`);
+        newText.setAttribute('y', `${ y }`);
+
+        if (xRange[1] - xRange[0] < newTextLength) {
+          newText.remove();
+          return;
+        }
+
+        this.svg.append(newText);
+
+        const leftRange: [number, number] = [xRange[0], xRange[1] / 2 - newTextLength / 2];
+        const leftItems = dates.slice(0, i);
+        this.putLabels(leftItems, y, leftRange);
+
+        const rightRange: [number, number] = [xRange[1] / 2 + newTextLength / 2, xRange[1]];
+        const rightItems = dates.slice(i);
+        this.putLabels(rightItems, y, rightRange);
+      }, 0);
+    }
   }
 }
 
