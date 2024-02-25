@@ -78,19 +78,25 @@ export class LineChart extends Chart {
     rightText.classList.add(lineStyles.horizontalLineLabel);
     rightText.textContent = data.dates[data.dates.length - 1];
     const rightLine = this.parent.ownerDocument.createElementNS(LineChart.svgNS, 'line');
-    setTimeout(() => {
-      const x = clientWidth - fontSize * longestValueLength;
-      rightText.setAttribute('x', `${ x - rightText.getComputedTextLength().valueOf() }`);
-      rightText.setAttribute('y', `${ (scaledHeight) + 1.5 * fontSize }`);
-      rightLine.setAttribute('x1', `${ x - 1 }`);
-      rightLine.setAttribute('x2', `${ x - 1 }`);
-      rightLine.setAttribute('y1', `${ (scaledHeight) }`);
-      rightLine.setAttribute('y2', `${ (scaledHeight) + fontSize / 3 }`);
-      rightLine.classList.add(lineStyles.bottomHorizontalLine);
-
-      this.putLabels(data.dates, scaledHeight + 1.5 * fontSize, [0, clientWidth - fontSize * longestValueLength]);
-    }, 0);
     this.svg.append(rightText, rightLine);
+    const x = clientWidth - fontSize * longestValueLength;
+    const rightTextX = x - rightText.getComputedTextLength().valueOf();
+    rightText.setAttribute('x', `${ rightTextX }`);
+    rightText.setAttribute('y', `${ (scaledHeight) + 1.5 * fontSize }`);
+    rightLine.setAttribute('x1', `${ x - 1 }`);
+    rightLine.setAttribute('x2', `${ x - 1 }`);
+    rightLine.setAttribute('y1', `${ (scaledHeight) }`);
+    rightLine.setAttribute('y2', `${ (scaledHeight) + fontSize / 3 }`);
+    rightLine.classList.add(lineStyles.bottomHorizontalLine);
+
+    // const debugDots = [this.parent.ownerDocument.createElementNS(LineChart.svgNS, 'circle'), this.parent.ownerDocument.createElementNS(LineChart.svgNS, 'circle')];
+    // debugDots.forEach((x, i) => {
+    //   x.setAttribute('r', '4');
+    //   x.setAttribute('fill', i == 0 ? 'red' : 'blue');
+    //   this.svg.append(x);
+    // })
+
+    this.putLabels(data.dates, scaledHeight + 1.5 * fontSize, { start: scaledHeight, end: (scaledHeight) + fontSize / 3 }, [leftText.getComputedTextLength().valueOf(), rightTextX]);
 
     const totalTextSpace = clientWidth - leftText.getComputedTextLength().valueOf() - rightText.getComputedTextLength().valueOf();
 
@@ -308,34 +314,58 @@ export class LineChart extends Chart {
   }
 
   // currentTextWidths: number[], isFar: [boolean, boolean]
-  private putLabels(dates: string[], y: number, xRange: [number, number]) {
+  private putLabels(dates: string[], textY: number, lineY: { start: number, end: number }, xRange: [number, number], debugDots: SVGCircleElement[] = []) {
     const i = Math.floor(dates.length / 2);
+    if (dates.length <= i) return;
 
-    if (dates.length % 2 === 1) {
-      const newText = this.parent.ownerDocument.createElementNS(LineChart.svgNS, 'text');
-      newText.classList.add(lineStyles.horizontalLineLabel);
-      newText.textContent = dates[i];
-      setTimeout(() => {
-        const newTextLength = newText.getComputedTextLength().valueOf();
-        newText.setAttribute('x', `${ (xRange[1] - xRange[0]) / 2 + xRange[0] }`);
-        newText.setAttribute('y', `${ y }`);
+    debugDots[0]?.setAttribute('cy', `${ textY }`);
+    debugDots[1]?.setAttribute('cy', `${ textY }`);
+    debugDots[0]?.setAttribute('cx', `${ xRange[0] }`);
+    debugDots[1]?.setAttribute('cx', `${ xRange[1] }`);
 
-        if (xRange[1] - xRange[0] < newTextLength) {
-          newText.remove();
-          return;
-        }
+    // if (dates.length % 2 === 1) {
+    const newText = this.parent.ownerDocument.createElementNS(LineChart.svgNS, 'text');
+    newText.classList.add(lineStyles.horizontalLineLabel);
+    newText.textContent = dates[i];
+    this.svg.append(newText);
+    const newTextLength = newText.getComputedTextLength().valueOf();
+    let x = (xRange[1] - xRange[0]) / 2 + xRange[0] - newTextLength / 2;
+    newText.setAttribute('x', `${ x }`);
+    newText.setAttribute('y', `${ textY }`);
+    const nextLine = this.parent.ownerDocument.createElementNS(LineChart.svgNS, 'line');
+    nextLine.setAttribute('x1', `${ x }`);
+    nextLine.setAttribute('x2', `${ x }`);
+    nextLine.setAttribute('y1', `${ lineY.start }`);
+    nextLine.setAttribute('y2', `${ lineY.end }`);
+    nextLine.classList.add(lineStyles.bottomHorizontalLine);
+    this.svg.append(newText, nextLine);
 
-        this.svg.append(newText);
-
-        const leftRange: [number, number] = [xRange[0], xRange[1] / 2 - newTextLength / 2];
-        const leftItems = dates.slice(0, i);
-        this.putLabels(leftItems, y, leftRange);
-
-        const rightRange: [number, number] = [xRange[1] / 2 + newTextLength / 2, xRange[1]];
-        const rightItems = dates.slice(i);
-        this.putLabels(rightItems, y, rightRange);
-      }, 0);
+    if (xRange[1] - xRange[0] <= newTextLength || xRange[0] > xRange[1]) {
+      newText.remove();
+      nextLine.remove();
+      return;
+      // } else if (x + newTextLength > xRange[1]) {
+      //   newText.setAttribute('x', `${ (xRange[0] + xRange[1]) / 2 }`);
     }
+
+    if (dates.length <= 1) return;
+
+    const leftRange: [number, number] = [xRange[0], x];
+    // newText.setAttribute('stroke', 'red');
+    // debugDots[0]?.setAttribute('cx', `${ leftRange[0] }`);
+    // debugDots[1]?.setAttribute('cx', `${ leftRange[1] }`);
+    // newText.setAttribute('stroke', 'black');
+    const leftItems = dates.slice(0, i);
+    this.putLabels(leftItems, textY, lineY, leftRange, debugDots);
+
+    const rightRange: [number, number] = [x + newTextLength, xRange[1]];
+    // newText.setAttribute('stroke', 'red');
+    // debugDots[0]?.setAttribute('cx', `${ rightRange[0] }`);
+    // debugDots[1]?.setAttribute('cx', `${ rightRange[1] }`);
+    // newText.setAttribute('stroke', 'black');
+    const rightItems = dates.slice(i);
+    this.putLabels(rightItems, textY, lineY, rightRange, debugDots);
+    // }
   }
 }
 
