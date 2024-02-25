@@ -32,4 +32,4 @@ const lineChartData: LineChartData = {
 };
 
 new LineChart(document.getElementById('diagram-container') as HTMLDivElement, 'All Campaigns', lineChartData);
-// new LineChart(document.getElementById('diagram-container2') as HTMLDivElement, 'All Campaigns', lineChartData);
+new LineChart(document.getElementById('diagram-container2') as HTMLDivElement, 'All Campaigns', lineChartData);
