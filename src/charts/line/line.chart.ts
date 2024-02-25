@@ -160,14 +160,42 @@ export class LineChart extends Chart {
     rightLine.setAttribute('y2', `${ (scaledHeight) + fontSize / 3 }`);
     rightLine.classList.add(lineStyles.bottomHorizontalLine);
 
-    this.putLabels(data.dates, data.dates.map((v, i) => i), scaledHeight + 1.5 * fontSize, { start: scaledHeight, end: (scaledHeight) + fontSize / 3 }, [], [leftText, rightText].map(t => t.getBBox()));
+    // this.putLabelsAround(data.dates, data.dates.map((v, i) => i), scaledHeight + 1.5 * fontSize, { start: scaledHeight, end: (scaledHeight) + fontSize / 3 }, [], [leftText, rightText].map(t => t.getBBox()));
+    this.putLabelsSubsequently(data.dates, scaledHeight + 1.5 * fontSize, { start: scaledHeight, end: (scaledHeight) + fontSize / 3 }, [], [leftText, rightText].map(t => t.getBBox()));
   }
 
-  private putLabels(allDates: string[], indices: number[], textY: number, lineY: { start: number, end: number }, debugDots: SVGCircleElement[], textBboxes: DOMRect[]) {
-    let i = Math.round(indices.length / 2);
-    if (indices.length <= i) return;
+  private putLabelsSubsequently(allDates: string[], textY: number, lineY: { start: number, end: number }, debugDots: SVGCircleElement[], textBboxes: DOMRect[]) {
+    allDates.forEach((x, i) => {
+      const newText = this.parent.ownerDocument.createElementNS(LineChart.svgNS, 'text');
+      newText.classList.add(lineStyles.horizontalLineLabel);
+      newText.textContent = allDates[i];
+      this.svg.append(newText);
+      const newTextLength = newText.getComputedTextLength().valueOf();
+      newText.setAttribute('x', `${ this.verticalLines[i].x1 - newTextLength / 2 }`);
+      newText.setAttribute('y', `${ textY }`);
+      const nextLine = this.parent.ownerDocument.createElementNS(LineChart.svgNS, 'line');
+      nextLine.setAttribute('x1', `${ this.verticalLines[i].x1 }`);
+      nextLine.setAttribute('x2', `${ this.verticalLines[i].x2 }`);
+      nextLine.setAttribute('y1', `${ lineY.start }`);
+      nextLine.setAttribute('y2', `${ lineY.end }`);
+      nextLine.classList.add(lineStyles.bottomHorizontalLine);
+      this.svg.append(newText, nextLine);
 
-    i = indices[i];
+      if (this.isTextOverlapping(textBboxes, newText.getBBox())) {
+        newText.remove();
+        nextLine.remove();
+        return;
+      }
+
+      textBboxes.push(newText.getBBox());
+    })
+  }
+
+  private putLabelsAround(allDates: string[], indices: number[], textY: number, lineY: { start: number, end: number }, debugDots: SVGCircleElement[], textBboxes: DOMRect[]) {
+    const indexI = Math.round(indices.length / 2);
+    if (indices.length <= indexI) return;
+
+    let i = indices[indexI];
 
     const newText = this.parent.ownerDocument.createElementNS(LineChart.svgNS, 'text');
     newText.classList.add(lineStyles.horizontalLineLabel);
@@ -184,21 +212,23 @@ export class LineChart extends Chart {
     nextLine.classList.add(lineStyles.bottomHorizontalLine);
     this.svg.append(newText, nextLine);
 
+    newText.setAttribute('stroke', 'red');
     if (this.isTextOverlapping(textBboxes, newText.getBBox())) {
       newText.remove();
       nextLine.remove();
       return;
     }
+    newText.setAttribute('stroke', 'black');
 
     if (indices.length <= 1) return;
 
     textBboxes.push(newText.getBBox());
 
-    const leftIndices = indices.slice(0, i);
-    this.putLabels(allDates, leftIndices, textY, lineY, debugDots, textBboxes);
+    const leftIndices = indices.slice(0, indexI);
+    this.putLabelsAround(allDates, leftIndices, textY, lineY, debugDots, textBboxes);
 
-    const rightIndices = indices.slice(i);
-    this.putLabels(allDates, rightIndices, textY, lineY, debugDots, textBboxes);
+    const rightIndices = indices.slice(indexI);
+    this.putLabelsAround(allDates, rightIndices, textY, lineY, debugDots, textBboxes);
   }
 
   private isTextOverlapping(allTexts: DOMRect[], newText: DOMRect) {
