@@ -1,13 +1,20 @@
-$fontColor: rgb(97, 97, 97);
-$borderColor: rgb(224, 224, 224);
+$lightFontColor: rgb(97, 97, 97);
+$lightBorderColor: rgb(224, 224, 224);
 
 .chart {
+    @media (prefers-color-scheme: dark) {
+        color: $lightBorderColor;
+        border: 1px $lightFontColor solid;
+    }
+    @media (prefers-color-scheme: light) {
+        color: $lightFontColor;
+        border: 1px $lightBorderColor solid;
+    }
+
     display: grid;
     grid-template-rows: min-content auto min-content;
     height: 100%;
     width: 100%;
-    color: $fontColor;
-    border: 1px $borderColor solid;
     font-family: "Roboto", serif;
     padding: 1em;
     gap: 1em;
@@ -29,9 +36,17 @@ $borderColor: rgb(224, 224, 224);
     }
 
     .bubble {
+        @media (prefers-color-scheme: light) {
+            background-color: white;
+            color: $lightFontColor;
+        }
+        @media (prefers-color-scheme: dark) {
+            background-color: #282828;
+            color: $lightBorderColor;
+        }
+
         pointer-events: none;
         position: absolute;
-        background-color: white;
         padding: 1em;
         display: block;;
         box-shadow: 0 2px 10px 0px #b2b2b2;
@@ -41,6 +56,12 @@ $borderColor: rgb(224, 224, 224);
     }
 
     .bubble::after {
+        @media (prefers-color-scheme: light) {
+            border-top: 10px solid white;
+        }
+        @media (prefers-color-scheme: dark) {
+            border-top: 10px solid #282828;
+        }
         content: "";
         position: absolute;
         width: 0;

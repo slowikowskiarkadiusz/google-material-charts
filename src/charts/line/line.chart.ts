@@ -3,6 +3,11 @@ import lineStyles from './line.chart.scss'
 import { v2d } from "../../v2d";
 import styles from "../chart.scss";
 
+export interface LineChartOptions {
+  configs?: LineConfig[],
+  simplifyLabels?: boolean,
+}
+
 const defaultConfigs: LineConfig[] = [
   { color: '#E40303', isDotted: false },
   { color: '#FF8C00', isDotted: false },
@@ -24,7 +29,7 @@ export class LineChart extends Chart {
   private dots?: SVGCircleElement[];
   private backgroundDot?: SVGCircleElement;
 
-  constructor(parent: HTMLDivElement, title: string, data: LineChartData, configs?: LineConfig[]) {
+  constructor(parent: HTMLDivElement, title: string, data: LineChartData, opts?: LineChartOptions) {
     super(parent, title);
     this.currentInstance = LineChart.instance++;
 
@@ -32,7 +37,7 @@ export class LineChart extends Chart {
 
     setTimeout(() => {
       const fontSize = parseInt(this.svg.computedStyleMap().get('font-size')!.toString().replace('px', ''));
-      const lineConfigs = configs ?? defaultConfigs;
+      const lineConfigs = opts?.configs ?? defaultConfigs;
       this.renderLegend(data, lineConfigs);
       // this.svg.setAttribute("viewBox", `0 0 ${ this.svg.clientWidth } ${ this.svg.clientHeight + 2 * fontSize }`)
       this.renderSvg(data, lineConfigs, fontSize);
@@ -61,18 +66,6 @@ export class LineChart extends Chart {
       horizontalLinesGroup.append(line);
     }
 
-    // [leftText, rightText].map(x => x.getComputedTextLength().valueOf())
-
-    // if (data.dates.length % 2 === 1) {
-    //   let i = Math.floor(data.dates.length / 2);
-    //   const middleText = this.parent.ownerDocument.createElementNS(LineChart.svgNS, 'text');
-    //   middleText.classList.add(lineStyles.horizontalLineLabel);
-    //   middleText.textContent = data.dates[data.dates.length - 1];
-    //   middleText.setAttribute('x', `${ x - middleText.getComputedTextLength().valueOf() }`);
-    //   middleText.setAttribute('y', `${ (scaledHeight) + 1.5 * fontSize }`);
-    // }
-
-
     this.addBubbleEvents(horizontalLinesGroup, data, configs);
     horizontalLinesGroup.classList.add(lineStyles.group);
     horizontalLinesGroup.style.pointerEvents = 'bounding-box';
@@ -92,7 +85,7 @@ export class LineChart extends Chart {
     for (let i = 0; i < horizontalLinesLabelsCount; i++) {
       const line = horizontalLinesGroup.children[i] as SVGLineElement;
       const path = this.parent.ownerDocument.createElementNS(LineChart.svgNS, 'path');
-      path.setAttribute('d', `M${ line.x2.animVal.value + this.svg.clientWidth * 0.05 },${ line.y1.animVal.value } L${ line.x2.animVal.value + this.svg.clientWidth * 0.5 },${ line.y1.animVal.value }`);
+      path.setAttribute('d', `M${ line.x2.animVal.value + fontSize },${ line.y1.animVal.value } L${ line.x2.animVal.value + fontSize * 3 },${ line.y1.animVal.value }`);
       const id = `horizontalLine${ this.currentInstance }${ i }`;
       path.setAttribute('id', id);
       const text = this.parent.ownerDocument.createElementNS(LineChart.svgNS, 'text');
@@ -104,7 +97,7 @@ export class LineChart extends Chart {
       horizontalLinesLabelsGroup.append(path, text);
     }
 
-    horizontalLinesLabelsGroup.setAttribute('transform', `translate(0, ${ fontSize })`);
+    horizontalLinesLabelsGroup.setAttribute('transform', `translate(0, ${ fontSize / 3 })`);
     horizontalLinesLabelsGroup.classList.add(lineStyles.group);
 
     const valuesPolygonsGroup = this.parent.ownerDocument.createElementNS(LineChart.svgNS, 'g');
@@ -160,11 +153,11 @@ export class LineChart extends Chart {
     rightLine.setAttribute('y2', `${ (scaledHeight) + fontSize / 3 }`);
     rightLine.classList.add(lineStyles.bottomHorizontalLine);
 
-    // this.putLabelsAround(data.dates, data.dates.map((v, i) => i), scaledHeight + 1.5 * fontSize, { start: scaledHeight, end: (scaledHeight) + fontSize / 3 }, [], [leftText, rightText].map(t => t.getBBox()));
     this.putLabelsSubsequently(data.dates, scaledHeight + 1.5 * fontSize, { start: scaledHeight, end: (scaledHeight) + fontSize / 3 }, [], [leftText, rightText].map(t => t.getBBox()));
   }
 
   private putLabelsSubsequently(allDates: string[], textY: number, lineY: { start: number, end: number }, debugDots: SVGCircleElement[], textBboxes: DOMRect[]) {
+    const newTexts: SVGTextElement[] = [];
     allDates.forEach((x, i) => {
       const newText = this.parent.ownerDocument.createElementNS(LineChart.svgNS, 'text');
       newText.classList.add(lineStyles.horizontalLineLabel);
@@ -187,48 +180,12 @@ export class LineChart extends Chart {
         return;
       }
 
+      newTexts.push(newText);
       textBboxes.push(newText.getBBox());
     })
-  }
 
-  private putLabelsAround(allDates: string[], indices: number[], textY: number, lineY: { start: number, end: number }, debugDots: SVGCircleElement[], textBboxes: DOMRect[]) {
-    const indexI = Math.round(indices.length / 2);
-    if (indices.length <= indexI) return;
-
-    let i = indices[indexI];
-
-    const newText = this.parent.ownerDocument.createElementNS(LineChart.svgNS, 'text');
-    newText.classList.add(lineStyles.horizontalLineLabel);
-    newText.textContent = allDates[i];
-    this.svg.append(newText);
-    const newTextLength = newText.getComputedTextLength().valueOf();
-    newText.setAttribute('x', `${ this.verticalLines[i].x1 - newTextLength / 2 }`);
-    newText.setAttribute('y', `${ textY }`);
-    const nextLine = this.parent.ownerDocument.createElementNS(LineChart.svgNS, 'line');
-    nextLine.setAttribute('x1', `${ this.verticalLines[i].x1 }`);
-    nextLine.setAttribute('x2', `${ this.verticalLines[i].x2 }`);
-    nextLine.setAttribute('y1', `${ lineY.start }`);
-    nextLine.setAttribute('y2', `${ lineY.end }`);
-    nextLine.classList.add(lineStyles.bottomHorizontalLine);
-    this.svg.append(newText, nextLine);
-
-    newText.setAttribute('stroke', 'red');
-    if (this.isTextOverlapping(textBboxes, newText.getBBox())) {
-      newText.remove();
-      nextLine.remove();
-      return;
-    }
-    newText.setAttribute('stroke', 'black');
-
-    if (indices.length <= 1) return;
-
-    textBboxes.push(newText.getBBox());
-
-    const leftIndices = indices.slice(0, indexI);
-    this.putLabelsAround(allDates, leftIndices, textY, lineY, debugDots, textBboxes);
-
-    const rightIndices = indices.slice(indexI);
-    this.putLabelsAround(allDates, rightIndices, textY, lineY, debugDots, textBboxes);
+    newTexts
+      .forEach(x => x.style.fontSize = '0.65em');
   }
 
   private isTextOverlapping(allTexts: DOMRect[], newText: DOMRect) {
@@ -283,7 +240,7 @@ export class LineChart extends Chart {
       this.bubble = this.parent.ownerDocument.createElement('div');
       this.bubble.classList.add(styles.bubble);
       this.parent.append(this.bubble);
-      // this.bubble.style.transition = 'all 0.1s';
+      setTimeout(() => this.bubble!.style.transition = 'all 0.07s', 0);
 
       this.backgroundDot = eventParent.ownerDocument.createElementNS(LineChart.svgNS, 'circle');
       this.backgroundDot.setAttribute('r', '12');
@@ -291,6 +248,8 @@ export class LineChart extends Chart {
       this.backgroundDot.style.opacity = '0.5';
       this.svg.append(this.backgroundDot);
     });
+
+    let delay: NodeJS.Timeout | undefined = undefined;
 
     eventParent.addEventListener('mousemove', (e: MouseEvent) => {
       const clientRect = eventParent.getBoundingClientRect();
@@ -315,14 +274,13 @@ export class LineChart extends Chart {
           dot.setAttribute('fill', configs[i].color);
           dot.setAttribute('r', vertexDotRadius);
           dot.style.pointerEvents = 'none';
-          // dot.style.transition = 'all 0.1s';
+          dot.style.transition = 'all 0.07s';
           this.svg.append(dot);
           return dot;
         });
 
-        let closestDot = this.dots[0];
         let closestDotDistance = Number.MAX_VALUE;
-        let closestDotIndex = 0;
+        let closestDotIndex = -1;
         this.dots.forEach((dot, i) => {
           const vertex = this.vertices[i][indexOfTheClosestLine];
           dot.setAttribute('cx', vertex.x.toString());
@@ -330,28 +288,40 @@ export class LineChart extends Chart {
 
           const currDistance = Math.abs(mousePos.y - dot.cy.animVal.value);
           if (closestDotDistance > currDistance) {
-            closestDot = dot;
             closestDotDistance = currDistance;
             closestDotIndex = i;
           }
         });
 
+        if (delay) {
+          clearTimeout(delay);
+          delay = undefined;
+        }
+
+        delay = setTimeout(() => {
+          if (closestDotIndex > -1 && this.dots)
+            this.svg.append(this.dots![closestDotIndex]);
+          delay = undefined;
+        }, 36);
+
         this.dots.forEach((dot, i) => {
-          dot.setAttribute('r', vertexDotRadius);
-          dot.setAttribute('fill', configs[i].color);
-          dot.removeAttribute('stroke-width');
-          dot.removeAttribute('stroke');
+          dot.setAttribute('r', i === closestDotIndex ? closestVertexDotRadius : vertexDotRadius);
+          if (i === closestDotIndex) {
+            dot.setAttribute('stroke', configs[closestDotIndex].color)
+            dot.classList.add(lineStyles.closestDot);
+          } else {
+            dot.setAttribute('fill', configs[i].color);
+            dot.removeAttribute('stroke-width');
+            dot.removeAttribute('stroke');
+            dot.classList.remove(lineStyles.closestDot);
+          }
         });
-        closestDot.setAttribute('r', closestVertexDotRadius);
-        closestDot.setAttribute('stroke', configs[closestDotIndex].color)
-        closestDot.setAttribute('fill', 'white');
-        closestDot.setAttribute('stroke-width', '2');
-        this.svg.append(closestDot);
 
         if (this.backgroundDot) {
+          setTimeout(() => this.backgroundDot!.style.transition = 'all 0.07s', 1);
           this.backgroundDot.setAttribute('fill', configs[closestDotIndex].color);
-          this.backgroundDot.setAttribute('cx', closestDot.cx.animVal.valueAsString);
-          this.backgroundDot.setAttribute('cy', closestDot.cy.animVal.valueAsString);
+          this.backgroundDot.setAttribute('cx', this.dots[closestDotIndex].cx.animVal.valueAsString);
+          this.backgroundDot.setAttribute('cy', this.dots[closestDotIndex].cy.animVal.valueAsString);
         }
 
         if (this.bubble) {
@@ -361,8 +331,8 @@ export class LineChart extends Chart {
           this.bubble.replaceChildren(valueSpan);
 
           const newPos = {
-            x: closestDot.cx.animVal.value - this.bubble.offsetWidth / 2,
-            y: closestDot.cy.animVal.value - this.bubble.offsetHeight / 2 - 15,
+            x: this.dots[closestDotIndex].cx.animVal.value - this.bubble.offsetWidth / 2,
+            y: this.dots[closestDotIndex].cy.animVal.value - this.bubble.offsetHeight / 2 - 15,
           }
           this.bubble.style.transform = `translate(${ newPos.x }px, ${ newPos.y }px)`;
         }
