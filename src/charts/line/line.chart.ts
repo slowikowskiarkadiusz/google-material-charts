@@ -33,10 +33,6 @@ export class LineChart extends TemporalChart<TemporalData, LineChartConfig> {
   private vertices: v2d[][] = [];
   private dots?: SVGCircleElement[];
   private backgroundDot?: SVGCircleElement;
-  private aabc = (() => {
-    console.log('aabcaabc');
-    return 'a'
-  })();
 
   constructor(parent: HTMLDivElement, title: string, data: TemporalData, configs?: LineChartConfig[]) {
     super(parent, title, data, configs ?? defaultConfigs);
@@ -76,12 +72,6 @@ export class LineChart extends TemporalChart<TemporalData, LineChartConfig> {
   }
 
   protected renderLegend(data: TemporalData, configs: LineChartConfig[]) {
-    this.aabc = 'b';
-    let thisaabc = (this as any).aabc;
-    let self = this as any;
-    this.svg.addEventListener('mousemove', (e: MouseEvent) => {
-      console.log(thisaabc, self.aabc, this.aabc);
-    });
     const legendData: LineChartLegendConfig[] = data.items.map((dataItem, i) => {
       return {
         label: dataItem.label,
@@ -137,94 +127,93 @@ export class LineChart extends TemporalChart<TemporalData, LineChartConfig> {
 
     let delay: NodeJS.Timeout | undefined = undefined;
 
-    // eventParent.addEventListener('mousemove', (e: MouseEvent) => {
-    //   const clientRect = eventParent.getBoundingClientRect();
-    //   let mousePos = new v2d(e.x - clientRect.x, e.y - clientRect.y);
-    //
-    //   console.log(thisabc, self.abc);
-    //   if (self.verticalLines?.length > 0) {
-    //     const closestVerticalLine = this.verticalLines.reduce((p, c) => Math.abs(c.x1 - mousePos.x) < Math.abs(p.x1 - mousePos.x) ? c : p);
-    //     const indexOfTheClosestLine = this.verticalLines.findIndex(v => v.y1 === closestVerticalLine.y1 && v.x1 === closestVerticalLine.x1 && v.y2 === closestVerticalLine.y2 && v.x2 === closestVerticalLine.x2);
-    //     this.mouseVerticalLine?.remove();
-    //     this.mouseVerticalLine = this.svg.ownerDocument.createElementNS(LineChart.svgNS, 'line');
-    //     this.mouseVerticalLine.style.pointerEvents = 'none';
-    //     this.svg.append(this.mouseVerticalLine);
-    //     this.mouseVerticalLine.classList.add(lineStyles.verticalLine);
-    //     this.mouseVerticalLine.setAttribute('x1', closestVerticalLine.x1.toString());
-    //     this.mouseVerticalLine.setAttribute('y1', closestVerticalLine.y1.toString());
-    //     this.mouseVerticalLine.setAttribute('x2', closestVerticalLine.x2.toString());
-    //     this.mouseVerticalLine.setAttribute('y2', closestVerticalLine.y2.toString());
-    //     this.mouseVerticalLine.parentElement?.insertBefore(this.mouseVerticalLine, this.mouseVerticalLine.parentElement.firstChild);
-    //
-    //     this.dots ??= data.items.map((x, i) => {
-    //       const dot = eventParent.ownerDocument.createElementNS(LineChart.svgNS, 'circle');
-    //       dot.setAttribute('fill', configs[i].color);
-    //       dot.setAttribute('r', vertexDotRadius);
-    //       dot.style.pointerEvents = 'none';
-    //       dot.style.transition = 'all 0.07s';
-    //       this.svg.append(dot);
-    //       return dot;
-    //     });
-    //
-    //     let closestDotDistance = Number.MAX_VALUE;
-    //     let closestDotIndex = -1;
-    //     this.dots.forEach((dot, i) => {
-    //       const vertex = this.vertices[i][indexOfTheClosestLine];
-    //       dot.setAttribute('cx', vertex.x.toString());
-    //       dot.setAttribute('cy', vertex.y.toString());
-    //
-    //       const currDistance = Math.abs(mousePos.y - dot.cy.animVal.value);
-    //       if (closestDotDistance > currDistance) {
-    //         closestDotDistance = currDistance;
-    //         closestDotIndex = i;
-    //       }
-    //     });
-    //
-    //     if (delay) {
-    //       clearTimeout(delay);
-    //       delay = undefined;
-    //     }
-    //
-    //     delay = setTimeout(() => {
-    //       if (closestDotIndex > -1 && this.dots)
-    //         this.svg.append(this.dots![closestDotIndex]);
-    //       delay = undefined;
-    //     }, 36);
-    //
-    //     this.dots.forEach((dot, i) => {
-    //       dot.setAttribute('r', i === closestDotIndex ? closestVertexDotRadius : vertexDotRadius);
-    //       if (i === closestDotIndex) {
-    //         dot.setAttribute('stroke', configs[closestDotIndex].color)
-    //         dot.classList.add(lineStyles.closestDot);
-    //       } else {
-    //         dot.setAttribute('fill', configs[i].color);
-    //         dot.removeAttribute('stroke-width');
-    //         dot.removeAttribute('stroke');
-    //         dot.classList.remove(lineStyles.closestDot);
-    //       }
-    //     });
-    //
-    //     if (this.backgroundDot) {
-    //       setTimeout(() => this.backgroundDot!.style.transition = 'all 0.07s', 1);
-    //       this.backgroundDot.setAttribute('fill', configs[closestDotIndex].color);
-    //       this.backgroundDot.setAttribute('cx', this.dots[closestDotIndex].cx.animVal.valueAsString);
-    //       this.backgroundDot.setAttribute('cy', this.dots[closestDotIndex].cy.animVal.valueAsString);
-    //     }
-    //
-    //     if (this.bubble) {
-    //       const valueSpan = eventParent.ownerDocument.createElement('div');
-    //       valueSpan.style.textAlign = 'center';
-    //       valueSpan.innerHTML = `<b>${ data.items[closestDotIndex].values[indexOfTheClosestLine].toString() }</b><div style="font-size: 0.75em">${ data.dates[indexOfTheClosestLine] }</div>`;
-    //       this.bubble.replaceChildren(valueSpan);
-    //
-    //       const newPos = {
-    //         x: this.dots[closestDotIndex].cx.animVal.value - this.bubble.offsetWidth / 2,
-    //         y: this.dots[closestDotIndex].cy.animVal.value - this.bubble.offsetHeight / 2 - 15,
-    //       }
-    //       this.bubble.style.transform = `translate(${ newPos.x }px, ${ newPos.y }px)`;
-    //     }
-    //   }
-    // });
+    eventParent.addEventListener('mousemove', (e: MouseEvent) => {
+      const clientRect = eventParent.getBoundingClientRect();
+      let mousePos = new v2d(e.x - clientRect.x, e.y - clientRect.y);
+
+      if (this.verticalLines?.length > 0) {
+        const closestVerticalLine = this.verticalLines.reduce((p, c) => Math.abs(c.x1 - mousePos.x) < Math.abs(p.x1 - mousePos.x) ? c : p);
+        const indexOfTheClosestLine = this.verticalLines.findIndex(v => v.y1 === closestVerticalLine.y1 && v.x1 === closestVerticalLine.x1 && v.y2 === closestVerticalLine.y2 && v.x2 === closestVerticalLine.x2);
+        this.mouseVerticalLine?.remove();
+        this.mouseVerticalLine = this.svg.ownerDocument.createElementNS(LineChart.svgNS, 'line');
+        this.mouseVerticalLine.style.pointerEvents = 'none';
+        this.svg.append(this.mouseVerticalLine);
+        this.mouseVerticalLine.classList.add(lineStyles.verticalLine);
+        this.mouseVerticalLine.setAttribute('x1', closestVerticalLine.x1.toString());
+        this.mouseVerticalLine.setAttribute('y1', closestVerticalLine.y1.toString());
+        this.mouseVerticalLine.setAttribute('x2', closestVerticalLine.x2.toString());
+        this.mouseVerticalLine.setAttribute('y2', closestVerticalLine.y2.toString());
+        this.mouseVerticalLine.parentElement?.insertBefore(this.mouseVerticalLine, this.mouseVerticalLine.parentElement.firstChild);
+
+        this.dots ??= data.items.map((x, i) => {
+          const dot = eventParent.ownerDocument.createElementNS(LineChart.svgNS, 'circle');
+          dot.setAttribute('fill', configs[i].color);
+          dot.setAttribute('r', vertexDotRadius);
+          dot.style.pointerEvents = 'none';
+          dot.style.transition = 'all 0.07s';
+          this.svg.append(dot);
+          return dot;
+        });
+
+        let closestDotDistance = Number.MAX_VALUE;
+        let closestDotIndex = -1;
+        this.dots.forEach((dot, i) => {
+          const vertex = this.vertices[i][indexOfTheClosestLine];
+          dot.setAttribute('cx', vertex.x.toString());
+          dot.setAttribute('cy', vertex.y.toString());
+
+          const currDistance = Math.abs(mousePos.y - dot.cy.animVal.value);
+          if (closestDotDistance > currDistance) {
+            closestDotDistance = currDistance;
+            closestDotIndex = i;
+          }
+        });
+
+        if (delay) {
+          clearTimeout(delay);
+          delay = undefined;
+        }
+
+        delay = setTimeout(() => {
+          if (closestDotIndex > -1 && this.dots)
+            this.svg.append(this.dots![closestDotIndex]);
+          delay = undefined;
+        }, 36);
+
+        this.dots.forEach((dot, i) => {
+          dot.setAttribute('r', i === closestDotIndex ? closestVertexDotRadius : vertexDotRadius);
+          if (i === closestDotIndex) {
+            dot.setAttribute('stroke', configs[closestDotIndex].color)
+            dot.classList.add(lineStyles.closestDot);
+          } else {
+            dot.setAttribute('fill', configs[i].color);
+            dot.removeAttribute('stroke-width');
+            dot.removeAttribute('stroke');
+            dot.classList.remove(lineStyles.closestDot);
+          }
+        });
+
+        if (this.backgroundDot) {
+          setTimeout(() => this.backgroundDot!.style.transition = 'all 0.07s', 1);
+          this.backgroundDot.setAttribute('fill', configs[closestDotIndex].color);
+          this.backgroundDot.setAttribute('cx', this.dots[closestDotIndex].cx.animVal.valueAsString);
+          this.backgroundDot.setAttribute('cy', this.dots[closestDotIndex].cy.animVal.valueAsString);
+        }
+
+        if (this.bubble) {
+          const valueSpan = eventParent.ownerDocument.createElement('div');
+          valueSpan.style.textAlign = 'center';
+          valueSpan.innerHTML = `<b>${ data.items[closestDotIndex].values[indexOfTheClosestLine].toString() }</b><div style="font-size: 0.75em">${ data.dates[indexOfTheClosestLine] }</div>`;
+          this.bubble.replaceChildren(valueSpan);
+
+          const newPos = {
+            x: this.dots[closestDotIndex].cx.animVal.value - this.bubble.offsetWidth / 2,
+            y: this.dots[closestDotIndex].cy.animVal.value - this.bubble.offsetHeight / 2 - 15,
+          }
+          this.bubble.style.transform = `translate(${ newPos.x }px, ${ newPos.y }px)`;
+        }
+      }
+    });
 
     eventParent.addEventListener('mouseleave', (e: MouseEvent) => {
       this.mouseVerticalLine?.remove();

@@ -29,14 +29,14 @@ export abstract class Chart<TData, TConfig extends ChartConfig> {
     this.legend.classList.add(styles.chartLegend);
     parent.append(this.legend);
 
-    // setTimeout(() => {
-    const fontSize = parseInt(this.svg.computedStyleMap().get('font-size')!.toString().replace('px', ''));
-    this.renderLegend(data, configs);
-    // this.svg.setAttribute("viewBox", `0 0 ${ this.svg.clientWidth } ${ this.svg.clientHeight + 2 * fontSize }`)
-    // this.lineConfigs = lineConfigs;
-    this.renderSvg(data, configs, fontSize);
-    this.svg.classList.remove(styles.chartContent);
-    this.svg.style.overflow = 'visible';
+    setTimeout(() => {
+      const fontSize = parseInt(this.svg.computedStyleMap().get('font-size')!.toString().replace('px', ''));
+      this.renderLegend(data, configs);
+      // this.svg.setAttribute("viewBox", `0 0 ${ this.svg.clientWidth } ${ this.svg.clientHeight + 2 * fontSize }`)
+      this.renderSvg(data, configs, fontSize);
+      this.svg.classList.remove(styles.chartContent);
+      this.svg.style.overflow = 'visible';
+    });
   }
 
   protected abstract renderSvg(data: TData, configs: TConfig[], fontSize: number): void;
