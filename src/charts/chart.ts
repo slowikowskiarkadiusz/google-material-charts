@@ -22,7 +22,6 @@ export abstract class Chart<TData, TConfig extends ChartConfig> {
 
     this.svg = document.createElementNS(Chart.svgNS, "svg");
     
-    
     this.svg.classList.add(styles.chartContent);
     parent.append(this.svg);
 

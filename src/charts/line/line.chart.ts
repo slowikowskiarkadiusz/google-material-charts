@@ -40,14 +40,6 @@ export class LineChart extends TemporalChart<TemporalData, LineChartConfig> {
 
   constructor(parent: HTMLDivElement, title: string, data: TemporalData, configs?: LineChartConfig[]) {
     super(parent, title, data, configs ?? defaultConfigs);
-    
-
-    this.aabc = 'b';
-    let thisaabc = (this as any).aabc;
-    let self = this as any;
-    this.svg.addEventListener('mousemove', (e: MouseEvent) => {
-      console.log(thisaabc, self.aabc, this.aabc);
-    });
 
     //
     // // setTimeout(() => {
@@ -84,6 +76,12 @@ export class LineChart extends TemporalChart<TemporalData, LineChartConfig> {
   }
 
   protected renderLegend(data: TemporalData, configs: LineChartConfig[]) {
+    this.aabc = 'b';
+    let thisaabc = (this as any).aabc;
+    let self = this as any;
+    this.svg.addEventListener('mousemove', (e: MouseEvent) => {
+      console.log(thisaabc, self.aabc, this.aabc);
+    });
     const legendData: LineChartLegendConfig[] = data.items.map((dataItem, i) => {
       return {
         label: dataItem.label,
