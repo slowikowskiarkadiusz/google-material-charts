@@ -1,6 +1,7 @@
-import { LineChart, LineChartData } from "./src/charts/line/line.chart";
+import { LineChart } from "./src/charts/line/line.chart";
+import { TemporalChart, TemporalData } from "./src/charts/temporal/temporal.chart";
 
-const lineChartData: LineChartData = {
+const lineChartData: TemporalData = {
   "items": [
     {
       "values": [250, 315, 275, 420, 370, 290, 435, 395, 310, 450, 516, 467, 519, 450, 413, 376, 408, 434, 457, 503, 599, 505, 496, 487, 570, 558, 652, 646, 654],
@@ -19,9 +20,9 @@ const lineChartData: LineChartData = {
       "label": "Item 4"
     },
     // {
-      // "values": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -18, -65, 4, -82, -25, -3, -15, -7, 53, -37, 11, -13, -65, -62, -153, -183, -229, -300, -258, -238],
-      // "values": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 18, 65, 4, 82, 25, 3, 15, 7, 53, 37, 11, 13, 65, 62, 153, 183, 229, 300, 258, 238],
-      // "label": "Item 5"
+    // "values": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -18, -65, 4, -82, -25, -3, -15, -7, 53, -37, 11, -13, -65, -62, -153, -183, -229, -300, -258, -238],
+    // "values": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 18, 65, 4, 82, 25, 3, 15, 7, 53, 37, 11, 13, 65, 62, 153, 183, 229, 300, 258, 238],
+    // "label": "Item 5"
     // }
   ],
   "dates": [
@@ -32,4 +33,4 @@ const lineChartData: LineChartData = {
 };
 
 new LineChart(document.getElementById('diagram-container') as HTMLDivElement, 'All Campaigns', lineChartData);
-new LineChart(document.getElementById('diagram-container2') as HTMLDivElement, 'All Campaigns', lineChartData);
+// new LineChart(document.getElementById('diagram-container2') as HTMLDivElement, 'All Campaigns', lineChartData);
