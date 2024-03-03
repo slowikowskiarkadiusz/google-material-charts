@@ -1,7 +1,6 @@
 import { ChartConfig, SvgPolygon } from "../chart";
 import lineStyles from './line.chart.scss'
 import { v2d } from "../../v2d";
-import styles from "../chart.scss";
 import { TemporalChart, TemporalData, TemporalItem, TemporalLegendConfig } from "../temporal/temporal.chart";
 
 export interface LineChartOptions {
@@ -16,7 +15,7 @@ interface LineChartLegendConfig extends TemporalLegendConfig {
   isDotted: boolean;
 }
 
-const defaultConfigs: LineChartConfig[] = [
+export const defaultConfigs: LineChartConfig[] = [
   { color: '#E40303', isDotted: false },
   { color: '#FF8C00', isDotted: false },
   { color: '#FFED00', isDotted: false },
@@ -36,17 +35,6 @@ export class LineChart extends TemporalChart<TemporalData, LineChartConfig> {
 
   constructor(parent: HTMLDivElement, title: string, data: TemporalData, configs?: LineChartConfig[]) {
     super(parent, title, data, configs ?? defaultConfigs);
-
-    //
-    // // setTimeout(() => {
-    //   const fontSize = parseInt(this.svg.computedStyleMap().get('font-size')!.toString().replace('px', ''));
-    //   this.renderLegend(data);
-    //   // this.svg.setAttribute("viewBox", `0 0 ${ this.svg.clientWidth } ${ this.svg.clientHeight + 2 * fontSize }`)
-    //   this.lineConfigs = lineConfigs;
-    //   this.renderSvg(data, this.lineConfigs, fontSize);
-    //   this.svg.classList.remove(styles.chartContent);
-    //   this.svg.style.overflow = 'visible';
-    // // }, 1);
   }
 
   protected renderTemporalSvg(data: TemporalData, configs: LineChartConfig[], fontSize: number) {
@@ -71,52 +59,10 @@ export class LineChart extends TemporalChart<TemporalData, LineChartConfig> {
     this.addBubbleEvents(this.horizontalLinesGroup!, data, configs);
   }
 
-  protected renderLegend(data: TemporalData, configs: LineChartConfig[]) {
-    const legendData: LineChartLegendConfig[] = data.items.map((dataItem, i) => {
-      return {
-        label: dataItem.label,
-        color: configs[i].color,
-        count: dataItem.values.reduce((p, c) => p + c),
-        isDotted: configs[i].isDotted
-      }
-    });
-
-    this.legend.innerHTML = '';
-    this.legend.style.display = 'grid';
-    this.legend.style.gridTemplateColumns = 'auto auto';
-    this.legend.style.gap = '0.5em';
-
-    legendData.forEach(x => {
-      const main = this.legend.ownerDocument.createElement('div');
-      main.style.display = 'grid';
-      main.style.gridTemplateColumns = '1em auto';
-      main.style.gap = '0.5em';
-      this.legend.append(main);
-      const stripParent = this.legend.ownerDocument.createElement('div');
-      stripParent.style.display = 'flex';
-      stripParent.style.justifyContent = 'center';
-      stripParent.style.alignItems = 'center';
-      main.append(stripParent);
-      const strip = this.legend.ownerDocument.createElement('div');
-      strip.style.height = '0.11em';
-      strip.style.width = '100%';
-      strip.style.backgroundColor = x.color;
-      stripParent.append(strip);
-      const label = this.legend.ownerDocument.createElement('span');
-      label.style.fontSize = '0.75em';
-      label.innerText = `${ x.label } (${ x.count })`;
-      main.append(label);
-    });
-  }
-
   private addBubbleEvents(eventParent: SVGElement, data: TemporalData, configs: LineChartConfig[]) {
     eventParent.style.pointerEvents = 'all';
     eventParent.addEventListener('mouseover', (e: MouseEvent) => {
-      this.bubble?.remove();
-      this.bubble = this.parent.ownerDocument.createElement('div');
-      this.bubble.classList.add(styles.bubble);
-      this.parent.append(this.bubble);
-      setTimeout(() => this.bubble!.style.transition = 'all 0.07s', 0);
+      this.makeBubble();
 
       this.backgroundDot = eventParent.ownerDocument.createElementNS(LineChart.svgNS, 'circle');
       this.backgroundDot.setAttribute('r', '12');
@@ -210,7 +156,8 @@ export class LineChart extends TemporalChart<TemporalData, LineChartConfig> {
             x: this.dots[closestDotIndex].cx.animVal.value - this.bubble.offsetWidth / 2,
             y: this.dots[closestDotIndex].cy.animVal.value - this.bubble.offsetHeight / 2 - 15,
           }
-          this.bubble.style.transform = `translate(${ newPos.x }px, ${ newPos.y }px)`;
+
+          this.moveBubbleTo(newPos);
         }
       }
     });
@@ -218,8 +165,7 @@ export class LineChart extends TemporalChart<TemporalData, LineChartConfig> {
     eventParent.addEventListener('mouseleave', (e: MouseEvent) => {
       this.mouseVerticalLine?.remove();
 
-      this.bubble?.remove();
-      this.bubble = undefined;
+      this.removeBubble();
 
       this.backgroundDot?.remove();
       this.backgroundDot = undefined;
@@ -229,13 +175,7 @@ export class LineChart extends TemporalChart<TemporalData, LineChartConfig> {
     });
   }
 
-  // currentTextWidths: number[], isFar: [boolean, boolean]
-
-
-  pizda(e: MouseEvent) {
-    let a = this.verticalLines?.length;
-    console.log(this, a);
-  }
+// currentTextWidths: number[], isFar: [boolean, boolean]
 }
 
 function makePolygons(items: TemporalItem[], width: number, height: number, offset: number, maxValue: number, minValue: number): SvgPolygon[] {

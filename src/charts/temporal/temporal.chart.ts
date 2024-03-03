@@ -84,6 +84,44 @@ export abstract class TemporalChart<TData extends TemporalData, TConfig extends 
 
   protected abstract renderTemporalSvg(data: TData, configs: TConfig[], fontSize: number): void;
 
+  protected renderLegend(data: TemporalData, configs: TConfig[]) {
+    const legendData: (ChartConfig & { label: string, count: number })[] = data.items.map((dataItem, i) => {
+      return {
+        label: dataItem.label,
+        color: configs[i].color,
+        count: dataItem.values.reduce((p, c) => p + c),
+        // isDotted: configs[i].isDotted
+      }
+    });
+
+    this.legend.innerHTML = '';
+    this.legend.style.display = 'grid';
+    this.legend.style.gridTemplateColumns = 'auto auto';
+    this.legend.style.gap = '0.5em';
+
+    legendData.forEach(x => {
+      const main = this.legend.ownerDocument.createElement('div');
+      main.style.display = 'grid';
+      main.style.gridTemplateColumns = '1em auto';
+      main.style.gap = '0.5em';
+      this.legend.append(main);
+      const stripParent = this.legend.ownerDocument.createElement('div');
+      stripParent.style.display = 'flex';
+      stripParent.style.justifyContent = 'center';
+      stripParent.style.alignItems = 'center';
+      main.append(stripParent);
+      const strip = this.legend.ownerDocument.createElement('div');
+      strip.style.height = '0.11em';
+      strip.style.width = '100%';
+      strip.style.backgroundColor = x.color;
+      stripParent.append(strip);
+      const label = this.legend.ownerDocument.createElement('span');
+      label.style.fontSize = '0.75em';
+      label.innerText = `${ x.label } (${ x.count })`;
+      main.append(label);
+    });
+  }
+
   private putAllLabels(data: TData, scaledHeight: number, fontSize: number, clientWidth: number, longestValueLength: number) {
     const leftText = this.parent.ownerDocument.createElementNS(Chart.svgNS, 'text');
     leftText.textContent = data.dates[0];

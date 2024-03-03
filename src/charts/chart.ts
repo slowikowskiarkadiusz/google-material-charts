@@ -21,7 +21,7 @@ export abstract class Chart<TData, TConfig extends ChartConfig> {
     parent.append(header);
 
     this.svg = document.createElementNS(Chart.svgNS, "svg");
-    
+
     this.svg.classList.add(styles.chartContent);
     parent.append(this.svg);
 
@@ -41,6 +41,23 @@ export abstract class Chart<TData, TConfig extends ChartConfig> {
 
   protected abstract renderSvg(data: TData, configs: TConfig[], fontSize: number): void;
   protected abstract renderLegend(data: TData, configs: TConfig[]): void;
+
+  protected makeBubble() {
+    this.bubble?.remove();
+    this.bubble = this.parent.ownerDocument.createElement('div');
+    this.bubble.classList.add(styles.bubble);
+    this.parent.append(this.bubble);
+    setTimeout(() => this.bubble!.style.transition = 'all 0.07s', 0);
+  }
+
+  protected moveBubbleTo(newPos: { x: number; y: number }) {
+    this.bubble!.style.transform = `translate(${ newPos.x }px, ${ newPos.y }px)`;
+  }
+
+  protected removeBubble() {
+    this.bubble?.remove();
+    this.bubble = undefined;
+  }
 }
 
 export interface ChartConfig {

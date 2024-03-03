@@ -1,5 +1,6 @@
 import { LineChart } from "./src/charts/line/line.chart";
 import { TemporalChart, TemporalData } from "./src/charts/temporal/temporal.chart";
+import { StackedAreaChart } from "./src/charts/stacked-area/stacked-area.chart";
 
 const lineChartData: TemporalData = {
   "items": [
@@ -32,5 +33,5 @@ const lineChartData: TemporalData = {
   ]
 };
 
-new LineChart(document.getElementById('diagram-container') as HTMLDivElement, 'All Campaigns', lineChartData);
-// new LineChart(document.getElementById('diagram-container2') as HTMLDivElement, 'All Campaigns', lineChartData);
+new StackedAreaChart(document.getElementById('diagram-container') as HTMLDivElement, 'All Campaigns', lineChartData);
+new LineChart(document.getElementById('diagram-container2') as HTMLDivElement, 'All Campaigns', lineChartData);
