@@ -6,11 +6,11 @@ export abstract class TemporalChart<TData extends TemporalData, TConfig extends 
   public verticalLines!: SvgLine[];
   // private mouseVerticalLine?: SVGLineElement;
 
-  protected constructor(parent: HTMLDivElement, title: string, data: TData, configs: TConfig[]) {
-    super(parent, title, data, configs);
+  protected constructor(parent: HTMLDivElement, title: string, data: TData, maxValue: number, configs: TConfig[]) {
+    super(parent, title, data, maxValue, configs);
   }
 
-  protected renderSvg(data: TData, configs: TConfig[], fontSize: number) {
+  protected renderSvg(data: TData, maxValue: number, configs: TConfig[], fontSize: number) {
     const { clientHeight, clientWidth } = this.svg;
     const spaceForChart = clientHeight - 2 * fontSize;
     const chartScale = spaceForChart / clientHeight;
@@ -30,14 +30,12 @@ export abstract class TemporalChart<TData extends TemporalData, TConfig extends 
       this.horizontalLinesGroup.append(line);
     }
 
-    // this.addBubbleEvents(this.horizontalLinesGroup, data, configs);
     this.horizontalLinesGroup.classList.add(lineStyles.group);
     this.horizontalLinesGroup.style.pointerEvents = 'bounding-box';
     const horizontalLinesLabelsCount = this.horizontalLinesGroup.childElementCount;
 
     const horizontalLinesLabelsGroup = this.parent.ownerDocument.createElementNS(Chart.svgNS, 'g');
     this.svg.append(horizontalLinesLabelsGroup);
-    const maxLabel = data.items.flatMap(x => x.values).reduce((p, c) => p > c ? p : c);
     for (let i = 0; i < horizontalLinesLabelsCount; i++) {
       const line = this.horizontalLinesGroup.children[i] as SVGLineElement;
       const path = this.parent.ownerDocument.createElementNS(Chart.svgNS, 'path');
@@ -48,7 +46,7 @@ export abstract class TemporalChart<TData extends TemporalData, TConfig extends 
       const textPath = this.parent.ownerDocument.createElementNS(Chart.svgNS, 'textPath');
       textPath.setAttribute('href', `#${ id }`);
       textPath.classList.add(lineStyles.horizontalLineLabel);
-      textPath.innerHTML = `${ Math.floor(maxLabel - maxLabel * (i) / 4) }`;
+      textPath.innerHTML = `${ Math.floor(maxValue - maxValue * (i) / 4) }`;
       text.append(textPath);
       horizontalLinesLabelsGroup.append(path, text);
     }
@@ -79,10 +77,10 @@ export abstract class TemporalChart<TData extends TemporalData, TConfig extends 
 
     this.putAllLabels(data, scaledHeight, fontSize, clientWidth, longestValueLength);
 
-    this.renderTemporalSvg(data, configs, fontSize);
+    this.renderTemporalSvg(data, maxValue, configs, fontSize);
   }
 
-  protected abstract renderTemporalSvg(data: TData, configs: TConfig[], fontSize: number): void;
+  protected abstract renderTemporalSvg(data: TData, maxValue: number, configs: TConfig[], fontSize: number): void;
 
   protected renderLegend(data: TemporalData, configs: TConfig[]) {
     const legendData: (ChartConfig & { label: string, count: number })[] = data.items.map((dataItem, i) => {

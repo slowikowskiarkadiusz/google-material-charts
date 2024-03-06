@@ -1,4 +1,4 @@
-import { ChartConfig, SvgPolygon } from "../chart";
+import { Chart, ChartConfig, SvgPolygon } from "../chart";
 import lineStyles from './line.chart.scss'
 import { v2d } from "../../v2d";
 import { TemporalChart, TemporalData, TemporalItem, TemporalLegendConfig } from "../temporal/temporal.chart";
@@ -33,18 +33,36 @@ export class LineChart extends TemporalChart<TemporalData, LineChartConfig> {
   private dots?: SVGCircleElement[];
   private backgroundDot?: SVGCircleElement;
 
-  constructor(parent: HTMLDivElement, title: string, data: TemporalData, configs?: LineChartConfig[]) {
-    super(parent, title, data, configs ?? defaultConfigs);
+  constructor(parent: HTMLDivElement, title: string, data: TemporalData, private isStacked: boolean = false, configs?: LineChartConfig[]) {
+    const maxValue = isStacked
+      ? data.dates.map((_, i) => data.items.map(v => v.values[i]).reduce((p, c) => p + c)).reduce((p, c) => p > c ? p : c)
+      : data.items.flatMap(x => x.values).reduce((p, c) => p > c ? p : c);
+    super(parent, title, data, maxValue, configs ?? defaultConfigs);
   }
 
-  protected renderTemporalSvg(data: TemporalData, configs: LineChartConfig[], fontSize: number) {
-    const valuesPolygonsGroup = this.parent.ownerDocument.createElementNS(LineChart.svgNS, 'g');
-    const polygonsData = makePolygons(data.items, this.horizontalLinesGroup!.getBBox().width, this.horizontalLinesGroup!.getBBox().height, 0, data.items.flatMap(x => x.values).reduce((p, c) => p > c ? p : c), 0);
+  protected renderTemporalSvg(data: TemporalData, maxValue: number, configs: LineChartConfig[], fontSize: number) {
+    const valuesPolygonsGroup = this.parent.ownerDocument.createElementNS(Chart.svgNS, 'g');
+    const polygonsData = makePolygons(data.items, this.horizontalLinesGroup!.getBBox().width, this.horizontalLinesGroup!.getBBox().height, 0, maxValue, 0, this.isStacked);
+    const backgroundColor = getBackgroundColor(this.svg);
+
     polygonsData
       .forEach((x, i) => {
-        const path = this.parent.ownerDocument.createElementNS(LineChart.svgNS, 'path');
+        if (this.isStacked) {
+          const polygon = this.parent.ownerDocument.createElementNS(Chart.svgNS, 'polygon');
+          polygon.setAttribute('points', x.polygon);
+          polygon.setAttribute('stroke', configs[i].color);
+          polygon.setAttribute('stroke-width', '2');
+          polygon.setAttribute('fill', configs[i].color);
+          valuesPolygonsGroup.append(polygon);
+        }
+      });
+
+    polygonsData
+      .forEach((x, i, c) => {
+        if (this.isStacked && i === c.length - 1) return;
+        const path = this.parent.ownerDocument.createElementNS(Chart.svgNS, 'path');
         path.setAttribute('d', x.path);
-        path.setAttribute('stroke', configs[i].color);
+        path.setAttribute('stroke', this.isStacked ? backgroundColor : configs[i].color);
         if (configs[i].isDotted)
           path.setAttribute('stroke-dasharray', '7');
         path.setAttribute('stroke-width', '2');
@@ -64,7 +82,7 @@ export class LineChart extends TemporalChart<TemporalData, LineChartConfig> {
     eventParent.addEventListener('mouseover', (e: MouseEvent) => {
       this.makeBubble();
 
-      this.backgroundDot = eventParent.ownerDocument.createElementNS(LineChart.svgNS, 'circle');
+      this.backgroundDot = eventParent.ownerDocument.createElementNS(Chart.svgNS, 'circle');
       this.backgroundDot.setAttribute('r', '12');
       this.backgroundDot.style.pointerEvents = 'none';
       this.backgroundDot.style.opacity = '0.5';
@@ -81,7 +99,7 @@ export class LineChart extends TemporalChart<TemporalData, LineChartConfig> {
         const closestVerticalLine = this.verticalLines.reduce((p, c) => Math.abs(c.x1 - mousePos.x) < Math.abs(p.x1 - mousePos.x) ? c : p);
         const indexOfTheClosestLine = this.verticalLines.findIndex(v => v.y1 === closestVerticalLine.y1 && v.x1 === closestVerticalLine.x1 && v.y2 === closestVerticalLine.y2 && v.x2 === closestVerticalLine.x2);
         this.mouseVerticalLine?.remove();
-        this.mouseVerticalLine = this.svg.ownerDocument.createElementNS(LineChart.svgNS, 'line');
+        this.mouseVerticalLine = this.svg.ownerDocument.createElementNS(Chart.svgNS, 'line');
         this.mouseVerticalLine.style.pointerEvents = 'none';
         this.svg.append(this.mouseVerticalLine);
         this.mouseVerticalLine.classList.add(lineStyles.verticalLine);
@@ -92,7 +110,7 @@ export class LineChart extends TemporalChart<TemporalData, LineChartConfig> {
         this.mouseVerticalLine.parentElement?.insertBefore(this.mouseVerticalLine, this.mouseVerticalLine.parentElement.firstChild);
 
         this.dots ??= data.items.map((x, i) => {
-          const dot = eventParent.ownerDocument.createElementNS(LineChart.svgNS, 'circle');
+          const dot = eventParent.ownerDocument.createElementNS(Chart.svgNS, 'circle');
           dot.setAttribute('fill', configs[i].color);
           dot.setAttribute('r', vertexDotRadius);
           dot.style.pointerEvents = 'none';
@@ -174,31 +192,53 @@ export class LineChart extends TemporalChart<TemporalData, LineChartConfig> {
       this.dots = undefined;
     });
   }
-
-// currentTextWidths: number[], isFar: [boolean, boolean]
 }
 
-function makePolygons(items: TemporalItem[], width: number, height: number, offset: number, maxValue: number, minValue: number): SvgPolygon[] {
+function makePolygons(items: TemporalItem[], width: number, height: number, offset: number, maxValue: number, minValue: number, isStacked: boolean): SvgPolygon[] {
   maxValue *= 1.25;
+  let lastItems: number[] | undefined = undefined;
+  let lastPoints: v2d[] | undefined = undefined;
+
   return items
     .map(item => {
-      let points = item
-        .values
+      let items = item.values.map((x, i) => x + (isStacked && lastItems ? lastItems[i] : 0));
+      lastItems = items;
+      let points = items
         .map(x => x / maxValue)
-        .map((v, i, c) => new v2d(i * width / (c.length - 1) + (i === 0 ? -1 : (i === c.length - 1 ? 1 : 0)) * offset, height - c[i] * height))
+        .map((v, i, c) => new v2d(
+          i * width / (c.length - 1) + (i === 0 ? -1 : (i === c.length - 1 ? 1 : 0)) * offset,
+          height - c[i] * height))
         .map(point => new v2d(parseFloat(point.x.toString().replaceAll(',', '.')), parseFloat(point.y.toString().replaceAll(',', '.'))));
+
+      let polygon = [
+        ...points.map((v) => `${ v.x },${ v.y }`),
+      ];
+
+      if (lastPoints)
+        polygon.reverse().splice(0, 0, ...lastPoints.map((v) => `${ v.x },${ v.y }`),)
+      else
+        polygon.splice(0, 0, `${ width + offset },${ height + offset }`, `${ -offset },${ height + offset }`,);
+
+      lastPoints = points;
 
       return {
         path: points.map((point, i) => `${ (!i ? 'M' : 'L') }${ point.x } ${ point.y }`).join(' '),
-        polygon: [
-          `${ -offset },${ height + offset }`,
-          ...points.map((v) => `${ v.x },${ v.y }`),
-          `${ width + offset },${ height + offset }`,
-        ]
+        polygon: polygon
           .join(' '),
         vertices: [...points],
       }
     });
+}
+
+function getBackgroundColor(element: Element): string {
+  const styleMap = window.getComputedStyle(element);
+  const backgroundColor = styleMap.getPropertyValue('background-color');
+  if (backgroundColor && backgroundColor !== 'rgba(0, 0, 0, 0)')
+    return backgroundColor.toString();
+  else if (element.parentElement)
+    return getBackgroundColor(element.parentElement);
+  else
+    return 'rgba(255, 255, 255, 1)';
 }
 
 function createSmoothPath(points: v2d[]): string {
@@ -221,3 +261,4 @@ function createSmoothPath(points: v2d[]): string {
 
   return pathData;
 }
+

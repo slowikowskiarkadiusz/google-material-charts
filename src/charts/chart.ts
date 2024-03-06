@@ -10,7 +10,7 @@ export abstract class Chart<TData, TConfig extends ChartConfig> {
   protected legend: HTMLDivElement;
   protected bubble?: HTMLDivElement;
 
-  protected constructor(protected parent: HTMLDivElement, title: string, data: TData, configs: TConfig[]) {
+  protected constructor(protected parent: HTMLDivElement, title: string, data: TData, maxValue: number, configs: TConfig[]) {
     this.currentInstance = ++Chart.instance;
     console.log(this.currentInstance);
     parent.classList.add(styles.chart);
@@ -33,13 +33,13 @@ export abstract class Chart<TData, TConfig extends ChartConfig> {
       const fontSize = parseInt(this.svg.computedStyleMap().get('font-size')!.toString().replace('px', ''));
       this.renderLegend(data, configs);
       // this.svg.setAttribute("viewBox", `0 0 ${ this.svg.clientWidth } ${ this.svg.clientHeight + 2 * fontSize }`)
-      this.renderSvg(data, configs, fontSize);
+      this.renderSvg(data, maxValue, configs, fontSize);
       this.svg.classList.remove(styles.chartContent);
       this.svg.style.overflow = 'visible';
     });
   }
 
-  protected abstract renderSvg(data: TData, configs: TConfig[], fontSize: number): void;
+  protected abstract renderSvg(data: TData, maxValue: number, configs: TConfig[], fontSize: number): void;
   protected abstract renderLegend(data: TData, configs: TConfig[]): void;
 
   protected makeBubble() {
