@@ -78,6 +78,7 @@ export class LineChart extends TemporalChart<TemporalData, LineChartConfig> {
   }
 
   private addBubbleEvents(eventParent: SVGElement, data: TemporalData, configs: LineChartConfig[]) {
+    const backgroundColor = getBackgroundColor(this.svg);
     eventParent.style.pointerEvents = 'all';
     eventParent.addEventListener('mouseover', (e: MouseEvent) => {
       this.makeBubble();
@@ -111,7 +112,7 @@ export class LineChart extends TemporalChart<TemporalData, LineChartConfig> {
 
         this.dots ??= data.items.map((x, i) => {
           const dot = eventParent.ownerDocument.createElementNS(Chart.svgNS, 'circle');
-          dot.setAttribute('fill', configs[i].color);
+          dot.setAttribute('fill', this.isStacked ? backgroundColor : configs[i].color);
           dot.setAttribute('r', vertexDotRadius);
           dot.style.pointerEvents = 'none';
           dot.style.transition = 'all 0.07s';
@@ -147,19 +148,20 @@ export class LineChart extends TemporalChart<TemporalData, LineChartConfig> {
         this.dots.forEach((dot, i) => {
           dot.setAttribute('r', i === closestDotIndex ? closestVertexDotRadius : vertexDotRadius);
           if (i === closestDotIndex) {
-            dot.setAttribute('stroke', configs[closestDotIndex].color)
-            dot.classList.add(lineStyles.closestDot);
+            dot.setAttribute('stroke', this.isStacked ? backgroundColor : configs[closestDotIndex].color)
+            dot.setAttribute('fill', this.isStacked ? backgroundColor : configs[i].color);
+            // dot.classList.add(lineStyles.closestDot);
           } else {
-            dot.setAttribute('fill', configs[i].color);
+            dot.setAttribute('fill', this.isStacked ? backgroundColor : configs[i].color);
             dot.removeAttribute('stroke-width');
             dot.removeAttribute('stroke');
-            dot.classList.remove(lineStyles.closestDot);
+            // dot.classList.remove(lineStyles.closestDot);
           }
         });
 
         if (this.backgroundDot) {
           setTimeout(() => this.backgroundDot!.style.transition = 'all 0.07s', 1);
-          this.backgroundDot.setAttribute('fill', configs[closestDotIndex].color);
+          this.backgroundDot.setAttribute('fill', this.isStacked ? backgroundColor : configs[closestDotIndex].color);
           this.backgroundDot.setAttribute('cx', this.dots[closestDotIndex].cx.animVal.valueAsString);
           this.backgroundDot.setAttribute('cy', this.dots[closestDotIndex].cy.animVal.valueAsString);
         }
