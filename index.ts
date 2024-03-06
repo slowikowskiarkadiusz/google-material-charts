@@ -1,5 +1,5 @@
-import { LineChart } from "./src/charts/line/line.chart";
 import { TemporalData } from "./src/charts/temporal/temporal.chart";
+import { LineChart } from "./src/charts/temporal/line/line.chart";
 
 const lineChartData: TemporalData = {
   "items": [

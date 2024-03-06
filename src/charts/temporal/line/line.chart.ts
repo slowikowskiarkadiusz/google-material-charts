@@ -1,7 +1,7 @@
-import { Chart, ChartConfig, SvgPolygon } from "../chart";
 import lineStyles from './line.chart.scss'
-import { v2d } from "../../v2d";
-import { TemporalChart, TemporalData, TemporalItem, TemporalLegendConfig } from "../temporal/temporal.chart";
+import { TemporalChart, TemporalData, TemporalItem, TemporalLegendConfig } from "../temporal.chart";
+import { v2d } from "../../../v2d";
+import { Chart, ChartConfig, SvgPolygon } from "../../chart";
 
 export interface LineChartOptions {
   configs?: LineChartConfig[],

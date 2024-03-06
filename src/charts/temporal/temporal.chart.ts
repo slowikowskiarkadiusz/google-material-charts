@@ -1,5 +1,5 @@
 import { Chart, ChartConfig, SvgLine } from "../chart";
-import lineStyles from "../line/line.chart.scss";
+import lineStyles from "./line/line.chart.scss";
 
 export abstract class TemporalChart<TData extends TemporalData, TConfig extends ChartConfig> extends Chart<TData, TConfig> {
   protected horizontalLinesGroup?: SVGGElement;
