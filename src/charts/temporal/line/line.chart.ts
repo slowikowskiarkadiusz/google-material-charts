@@ -149,7 +149,7 @@ export class LineChart extends TemporalChart<TemporalData, LineChartConfig> {
           dot.setAttribute('r', i === closestDotIndex ? closestVertexDotRadius : vertexDotRadius);
           if (i === closestDotIndex) {
             dot.setAttribute('stroke', this.isStacked ? backgroundColor : configs[closestDotIndex].color)
-            dot.setAttribute('fill', this.isStacked ? backgroundColor : configs[i].color);
+            dot.setAttribute('fill', !this.isStacked ? backgroundColor : configs[i].color);
             // dot.classList.add(lineStyles.closestDot);
           } else {
             dot.setAttribute('fill', this.isStacked ? backgroundColor : configs[i].color);
