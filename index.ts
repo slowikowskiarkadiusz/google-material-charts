@@ -1,5 +1,6 @@
 import { TemporalData } from "./src/charts/temporal/temporal.chart";
 import { LineChart } from "./src/charts/temporal/line/line.chart";
+import { addStyles } from "./src/add-styles";
 //
 // const lineChartData: TemporalData = {
 //   "items": [
@@ -34,5 +35,7 @@ import { LineChart } from "./src/charts/temporal/line/line.chart";
 //
 // new LineChart(document.getElementById('diagram-container') as HTMLDivElement, 'All Campaigns', lineChartData, true);
 // new LineChart(document.getElementById('diagram-container2') as HTMLDivElement, 'All Campaigns', lineChartData);
+
+addStyles();
 
 export { LineChart, TemporalData }
