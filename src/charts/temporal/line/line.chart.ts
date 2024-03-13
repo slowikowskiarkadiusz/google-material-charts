@@ -1,4 +1,3 @@
-import lineStyles from './line.chart.scss'
 import { TemporalChart, TemporalData, TemporalItem, TemporalLegendConfig } from "../temporal.chart";
 import { v2d } from "../../../v2d";
 import { Chart, ChartConfig, SvgPolygon } from "../../chart";
@@ -72,7 +71,7 @@ export class LineChart extends TemporalChart<TemporalData, LineChartConfig> {
     this.vertices = polygonsData.map(x => x.vertices.map(y => new v2d(y.x, y.y)));
 
     this.svg.append(valuesPolygonsGroup);
-    valuesPolygonsGroup.classList.add(lineStyles.group);
+    valuesPolygonsGroup.classList.add('__group');
 
     this.addBubbleEvents(this.horizontalLinesGroup!, data, configs);
   }
@@ -103,7 +102,7 @@ export class LineChart extends TemporalChart<TemporalData, LineChartConfig> {
         this.mouseVerticalLine = this.svg.ownerDocument.createElementNS(Chart.svgNS, 'line');
         this.mouseVerticalLine.style.pointerEvents = 'none';
         this.svg.append(this.mouseVerticalLine);
-        this.mouseVerticalLine.classList.add(lineStyles.verticalLine);
+        this.mouseVerticalLine.classList.add('__verticalLine');
         this.mouseVerticalLine.setAttribute('x1', closestVerticalLine.x1.toString());
         this.mouseVerticalLine.setAttribute('y1', closestVerticalLine.y1.toString());
         this.mouseVerticalLine.setAttribute('x2', closestVerticalLine.x2.toString());
@@ -150,12 +149,12 @@ export class LineChart extends TemporalChart<TemporalData, LineChartConfig> {
           if (i === closestDotIndex) {
             dot.setAttribute('stroke', this.isStacked ? backgroundColor : configs[closestDotIndex].color)
             dot.setAttribute('fill', !this.isStacked ? backgroundColor : configs[i].color);
-            // dot.classList.add(lineStyles.closestDot);
+            // dot.classList.add('__closestDot');
           } else {
             dot.setAttribute('fill', this.isStacked ? backgroundColor : configs[i].color);
             dot.removeAttribute('stroke-width');
             dot.removeAttribute('stroke');
-            // dot.classList.remove(lineStyles.closestDot);
+            // dot.classList.remove('__closestDot');
           }
         });
 

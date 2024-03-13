@@ -1,4 +1,3 @@
-import styles from './chart.scss';
 import { v2d } from "../v2d";
 
 export abstract class Chart<TData, TConfig extends ChartConfig> {
@@ -13,20 +12,20 @@ export abstract class Chart<TData, TConfig extends ChartConfig> {
   protected constructor(protected parent: HTMLDivElement, title: string, data: TData, maxValue: number, configs: TConfig[]) {
     this.currentInstance = ++Chart.instance;
     console.log(this.currentInstance);
-    parent.classList.add(styles.chart);
+    parent.classList.add('__chart');
 
     const header = this.parent.ownerDocument.createElement('h1');
     header.innerText = title;
-    header.classList.add(styles.chartHeader);
+    header.classList.add('__chartHeader');
     parent.append(header);
 
     this.svg = document.createElementNS(Chart.svgNS, "svg");
 
-    this.svg.classList.add(styles.chartContent);
+    this.svg.classList.add('__chartContent');
     parent.append(this.svg);
 
     this.legend = this.parent.ownerDocument.createElement('div');
-    this.legend.classList.add(styles.chartLegend);
+    this.legend.classList.add('__chartLegend');
     parent.append(this.legend);
 
     setTimeout(() => {
@@ -34,7 +33,7 @@ export abstract class Chart<TData, TConfig extends ChartConfig> {
       this.renderLegend(data, configs);
       // this.svg.setAttribute("viewBox", `0 0 ${ this.svg.clientWidth } ${ this.svg.clientHeight + 2 * fontSize }`)
       this.renderSvg(data, maxValue, configs, fontSize);
-      this.svg.classList.remove(styles.chartContent);
+      this.svg.classList.remove('__chartContent');
       this.svg.style.overflow = 'visible';
     });
   }
@@ -45,7 +44,7 @@ export abstract class Chart<TData, TConfig extends ChartConfig> {
   protected makeBubble() {
     this.bubble?.remove();
     this.bubble = this.parent.ownerDocument.createElement('div');
-    this.bubble.classList.add(styles.bubble);
+    this.bubble.classList.add('__bubble');
     this.parent.append(this.bubble);
     setTimeout(() => this.bubble!.style.transition = 'all 0.07s', 0);
   }
