@@ -1,4 +1,8 @@
 {
+  "name": "google-material-charts",
+  "version": "0.0.1",
+  "main": "index.ts",
+  "types": "index.d.ts",
   "scripts": {
     "start": "webpack serve --mode development",
     "build": "webpack"
