@@ -44,17 +44,19 @@ export class LineChart extends TemporalChart<TemporalData, LineChartConfig> {
     const polygonsData = makePolygons(data.items, this.horizontalLinesGroup!.getBBox().width, this.horizontalLinesGroup!.getBBox().height, 0, maxValue, 0, this.isStacked);
     const backgroundColor = getBackgroundColor(this.svg);
 
-    polygonsData
-      .forEach((x, i) => {
-        if (this.isStacked) {
+    if (this.isStacked) {
+      polygonsData
+        .forEach((x, i) => {
           const polygon = this.parent.ownerDocument.createElementNS(Chart.svgNS, 'polygon');
           polygon.setAttribute('points', x.polygon);
           polygon.setAttribute('stroke', configs[i].color);
           polygon.setAttribute('stroke-width', '2');
           polygon.setAttribute('fill', configs[i].color);
           valuesPolygonsGroup.append(polygon);
-        }
-      });
+          const rect = polygon.getBoundingClientRect();
+          polygon.style.setProperty('transform', `translateY(-${ rect.y + rect.height - this.bottomLine!.getBoundingClientRect().y }px)`);
+        });
+    }
 
     polygonsData
       .forEach((x, i, c) => {
@@ -67,6 +69,8 @@ export class LineChart extends TemporalChart<TemporalData, LineChartConfig> {
         path.setAttribute('stroke-width', '2');
         path.setAttribute('fill', 'none');
         valuesPolygonsGroup.append(path);
+        const rect = path.getBoundingClientRect();
+        path.style.setProperty('transform', `translateY(-${ rect.y + rect.height - this.bottomLine!.getBoundingClientRect().y }px)`);
       });
     this.vertices = polygonsData.map(x => x.vertices.map(y => new v2d(y.x, y.y)));
 
