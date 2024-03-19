@@ -18,6 +18,10 @@ export function addStyles() {
     font-family: "Roboto", serif;
     padding: 1em;
     gap: 1em;
+    background-color: white;
+    border-radius: 4px;
+    border-style: 0px solid white;
+    box-shadow: 0px 2px 1px -1px rgba(0, 0, 0, 0.2), 0px 1px 1px 0px rgba(0, 0, 0, 0.14), 0px 1px 3px 0px rgba(0, 0, 0, 0.12);
 }
 
 
@@ -108,7 +112,15 @@ export function addStyles() {
 }
 
 .__bottomHorizontalLine {
-    @extend .horizontalLine;
+    // @extend .horizontalLine;
+    
+    @media (prefers-color-scheme: light) {
+        stroke: rgb(224, 224, 224);
+    }
+    @media (prefers-color-scheme: dark) {
+        stroke: rgb(97, 97, 97);
+    }
+    stroke-width: 1;
 
     stroke-width: 2;
 }

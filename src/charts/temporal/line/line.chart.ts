@@ -33,9 +33,9 @@ export class LineChart extends TemporalChart<TemporalData, LineChartConfig> {
   private backgroundDot?: SVGCircleElement;
 
   constructor(parent: HTMLDivElement, title: string, data: TemporalData, private isStacked: boolean = false, configs?: LineChartConfig[]) {
-    const maxValue = isStacked
+    const maxValue = (isStacked
       ? data.dates.map((_, i) => data.items.map(v => v.values[i]).reduce((p, c) => p + c)).reduce((p, c) => p > c ? p : c)
-      : data.items.flatMap(x => x.values).reduce((p, c) => p > c ? p : c);
+      : data.items.flatMap(x => x.values).reduce((p, c) => p > c ? p : c)) * 1.1;
     super(parent, title, data, maxValue, configs ?? defaultConfigs);
   }
 
