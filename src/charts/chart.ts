@@ -8,25 +8,31 @@ export abstract class Chart<TData, TConfig extends ChartConfig> {
   protected svg: SVGElement;
   protected legend: HTMLDivElement;
   protected bubble?: HTMLDivElement;
+  protected parent: HTMLDivElement;
 
-  protected constructor(protected parent: HTMLDivElement, title: string, data: TData, maxValue: number, configs: TConfig[]) {
+  protected constructor(parent: HTMLDivElement, title: string, data: TData, maxValue: number, configs: TConfig[]) {
     this.currentInstance = ++Chart.instance;
-    console.log(this.currentInstance);
-    parent.classList.add('__chart');
+
+    this.parent = parent.ownerDocument.createElement('div');
+    this.parent.style.setProperty('height', `calc(${ parent.style.height } - 2em - 2px`);
+    parent.style.setProperty('display', 'flex');
+    parent.append(this.parent);
+
+    this.parent.classList.add('__chart');
 
     const header = this.parent.ownerDocument.createElement('h1');
     header.innerText = title;
     header.classList.add('__chartHeader');
-    parent.append(header);
+    this.parent.append(header);
 
     this.svg = document.createElementNS(Chart.svgNS, "svg");
-
+    // this.svg.style.setProperty('height', '1px');
     this.svg.classList.add('__chartContent');
-    parent.append(this.svg);
+    this.parent.append(this.svg);
 
     this.legend = this.parent.ownerDocument.createElement('div');
     this.legend.classList.add('__chartLegend');
-    parent.append(this.legend);
+    this.parent.append(this.legend);
 
     setTimeout(() => {
       const fontSize = parseInt((this.svg as any).computedStyleMap().get('font-size')!.toString().replace('px', ''));

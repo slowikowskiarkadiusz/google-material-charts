@@ -35,6 +35,7 @@ import { addStyles } from "./src/add-styles";
 //
 // new LineChart(document.getElementById('diagram-container') as HTMLDivElement, 'All Campaigns', lineChartData, true);
 // new LineChart(document.getElementById('diagram-container2') as HTMLDivElement, 'All Campaigns', lineChartData);
+// new LineChart(document.getElementById('diagram-container3') as HTMLDivElement, 'All Campaigns', lineChartData);
 
 addStyles();
 
