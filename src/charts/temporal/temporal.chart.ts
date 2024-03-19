@@ -1,8 +1,9 @@
 import { Chart, ChartConfig, SvgLine } from "../chart";
 
 export abstract class TemporalChart<TData extends TemporalData, TConfig extends ChartConfig> extends Chart<TData, TConfig> {
-  protected horizontalLinesGroup?: SVGGElement;
   public verticalLines!: SvgLine[];
+  protected horizontalLinesGroup?: SVGGElement;
+  protected bottomLine?: SVGElement;
   // private mouseVerticalLine?: SVGLineElement;
 
   protected constructor(parent: HTMLDivElement, title: string, data: TData, maxValue: number, configs: TConfig[]) {
@@ -26,7 +27,7 @@ export abstract class TemporalChart<TData extends TemporalData, TConfig extends 
       line.setAttribute('y1', `${ (scaledHeight) * (i) / 4 }`);
       line.setAttribute('y2', `${ (scaledHeight) * (i) / 4 }`);
       line.classList.add(i === horizontalLinesCount ? '__bottomHorizontalLine' : '__horizontalLine');
-      this.horizontalLinesGroup.append(line);
+      this.horizontalLinesGroup.append(this.bottomLine = line);
     }
 
     this.horizontalLinesGroup.classList.add('__group');
