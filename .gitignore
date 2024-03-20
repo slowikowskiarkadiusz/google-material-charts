@@ -131,4 +131,7 @@ dist
 
 
 *.js
+!tsc-out/**/*.js
 *.js.map
+!tsc-out/**/*.js.map
+

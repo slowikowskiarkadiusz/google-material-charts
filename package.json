@@ -1,12 +1,14 @@
 {
   "name": "google-material-charts",
   "version": "0.0.1",
-  "main": "index.ts",
-  "types": "index.d.ts",
+  "main": "tsc-out/index.js",
+  "types": "tsc-out/index.d.ts",
   "scripts": {
-    "start": "webpack serve --mode development",
-    "build": "webpack"
+    "start": "webpack serve --mode development"
   },
+  "files": [
+    "tsc-out/**/*"
+  ],
   "dependencies": {
     "babel-loader": "^9.1.3",
     "rxjs": "^7.8.1",
