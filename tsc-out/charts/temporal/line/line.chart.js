@@ -1,3 +1,4 @@
+import lineStyles from './line.chart.scss';
 import { TemporalChart } from "../temporal.chart";
 import { v2d } from "../../../v2d";
 import { Chart } from "../../chart";
@@ -54,7 +55,7 @@ export class LineChart extends TemporalChart {
         });
         this.vertices = polygonsData.map(x => x.vertices.map(y => new v2d(y.x, y.y)));
         this.svg.append(valuesPolygonsGroup);
-        valuesPolygonsGroup.classList.add('__group');
+        valuesPolygonsGroup.classList.add(lineStyles.group);
         this.addBubbleEvents(this.horizontalLinesGroup, data, configs);
     }
     addBubbleEvents(eventParent, data, configs) {
@@ -79,7 +80,7 @@ export class LineChart extends TemporalChart {
                 this.mouseVerticalLine = this.svg.ownerDocument.createElementNS(Chart.svgNS, 'line');
                 this.mouseVerticalLine.style.pointerEvents = 'none';
                 this.svg.append(this.mouseVerticalLine);
-                this.mouseVerticalLine.classList.add('__verticalLine');
+                this.mouseVerticalLine.classList.add(lineStyles.verticalLine);
                 this.mouseVerticalLine.setAttribute('x1', closestVerticalLine.x1.toString());
                 this.mouseVerticalLine.setAttribute('y1', closestVerticalLine.y1.toString());
                 this.mouseVerticalLine.setAttribute('x2', closestVerticalLine.x2.toString());
@@ -120,13 +121,13 @@ export class LineChart extends TemporalChart {
                     if (i === closestDotIndex) {
                         dot.setAttribute('stroke', this.isStacked ? backgroundColor : configs[closestDotIndex].color);
                         dot.setAttribute('fill', !this.isStacked ? backgroundColor : configs[i].color);
-                        // dot.classList.add('__closestDot');
+                        // dot.classList.add(lineStyles.closestDot);
                     }
                     else {
                         dot.setAttribute('fill', this.isStacked ? backgroundColor : configs[i].color);
                         dot.removeAttribute('stroke-width');
                         dot.removeAttribute('stroke');
-                        // dot.classList.remove('__closestDot');
+                        // dot.classList.remove(lineStyles.closestDot);
                     }
                 });
                 if (this.backgroundDot) {

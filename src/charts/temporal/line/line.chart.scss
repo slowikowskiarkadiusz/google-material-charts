@@ -1,0 +1,55 @@
+@import '../../chart';
+
+.horizontalLine {
+    @media (prefers-color-scheme: light) {
+        stroke: $lightBorderColor;
+    }
+    //@media (prefers-color-scheme: dark) {
+    //    stroke: $lightFontColor;
+    //}
+    stroke-width: 1;
+}
+
+.verticalLine {
+    @media (prefers-color-scheme: light) {
+        stroke: $lightBorderColor;
+    }
+    //@media (prefers-color-scheme: dark) {
+    //    stroke: $lightFontColor;
+    //}
+    stroke-width: 1;
+    stroke-dasharray: 2;
+}
+
+.horizontalLineLabel {
+    @media (prefers-color-scheme: light) {
+        fill: $lightFontColor;
+    }
+    //@media (prefers-color-scheme: dark) {
+    //    fill: $lightBorderColor;
+    //}
+    font-size: 0.75em;
+}
+
+.bottomHorizontalLine {
+    @extend .horizontalLine;
+
+    stroke-width: 2;
+}
+
+.closestDot {
+    @media (prefers-color-scheme: light) {
+        fill: white;
+    }
+    //@media (prefers-color-scheme: dark) {
+    //    fill: #282828;
+    //}
+
+    stroke-width: 2;
+}
+
+.group {
+    * {
+        pointer-events: none;
+    }
+}
