@@ -110,6 +110,7 @@
     "./node_modules/*"
   ],
   "include": [
-    "src/**/*"
+    "src/**/*",
+    "src/charts/chart.scss"
   ]
 }

@@ -1,5 +1,4 @@
-import { TemporalData } from "./src/charts/temporal/temporal.chart";
-import { LineChart } from "./src/charts/temporal/line/line.chart";
+import { LineChart, TemporalData } from "./node_modules/google-material-charts/tsc-out/index";
 
 const lineChartData: TemporalData = {
   "items": [
@@ -35,7 +34,3 @@ const lineChartData: TemporalData = {
 new LineChart(document.getElementById('diagram-container') as HTMLDivElement, 'All Campaigns', lineChartData, true);
 new LineChart(document.getElementById('diagram-container2') as HTMLDivElement, 'All Campaigns', lineChartData);
 new LineChart(document.getElementById('diagram-container3') as HTMLDivElement, 'All Campaigns', lineChartData);
-
-// addStyles();
-
-export { LineChart, TemporalData }
