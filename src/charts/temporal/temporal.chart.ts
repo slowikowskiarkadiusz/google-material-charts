@@ -5,7 +5,6 @@ export abstract class TemporalChart<TData extends TemporalData, TConfig extends 
   public verticalLines!: SvgLine[];
   protected horizontalLinesGroup?: SVGGElement;
   protected bottomLine?: SVGElement;
-  // private mouseVerticalLine?: SVGLineElement;
 
   protected constructor(parent: HTMLDivElement, title: string, data: TData, maxValue: number, configs: TConfig[]) {
     super(parent, title, data, maxValue, configs);

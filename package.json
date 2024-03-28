@@ -5,8 +5,7 @@
   "umd:main": "dist/bundle.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "webpack",
-    "build2": "node tools/cleanup umd && webpack --config webpack.config.js"
+    "build": "webpack"
   },
   "files": [
     "dist/**/*"
