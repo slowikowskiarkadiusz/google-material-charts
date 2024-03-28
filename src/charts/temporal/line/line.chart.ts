@@ -18,10 +18,10 @@ interface LineChartLegendConfig extends TemporalLegendConfig {
 export const defaultConfigs: LineChartConfig[] = [
   { color: '#E40303', isDotted: false },
   { color: '#FF8C00', isDotted: false },
-  { color: '#FFED00', isDotted: false },
   { color: '#008026', isDotted: false },
   { color: '#24408E', isDotted: false },
   { color: '#732982', isDotted: false },
+  { color: '#FFED00', isDotted: false },
 ];
 
 const vertexDotRadius = '4';

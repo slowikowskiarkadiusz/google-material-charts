@@ -32,16 +32,20 @@ export abstract class Chart<TData, TConfig extends ChartConfig> {
     setTimeout(() => {
       const fontSize = parseInt((this.svg as any).computedStyleMap().get('font-size')!.toString().replace('px', ''));
       this.renderLegend(data, configs);
-      this.renderSvg(data, maxValue, configs, fontSize);
-      this.svg.classList.remove(styles.chartContent);
-      this.svg.style.overflow = 'visible';
+      this.generateSvg(data, maxValue, configs, fontSize);
 
       window.addEventListener('resize', e => {
-        console.log('resize');
-        // this.svg.innerHTML = '';
-        // this.renderSvg(data, maxValue, configs, fontSize);
+        this.svg.classList.add(styles.chartContent);
+        setTimeout(() => this.generateSvg(data, maxValue, configs, fontSize));
       });
     });
+  }
+
+  protected generateSvg(data: TData, maxValue: number, configs: TConfig[], fontSize: number) {
+    this.svg.innerHTML = '';
+    this.renderSvg(data, maxValue, configs, fontSize);
+    this.svg.classList.remove(styles.chartContent);
+    this.svg.style.overflow = 'visible';
   }
 
   protected abstract renderSvg(data: TData, maxValue: number, configs: TConfig[], fontSize: number): void;
