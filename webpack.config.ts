@@ -14,9 +14,18 @@ module.exports = {
       {
         test: /\.scss$/,
         use: [
-          'style-loader',
-          MiniCssExtractPlugin.loader,
-          'css-loader',
+          process.env.NODE_ENV !== 'production'
+            ? 'style-loader'
+            : MiniCssExtractPlugin.loader,
+          {
+            loader: 'css-loader',
+            options: {
+              modules: {
+                localIdentName: '[name]__[local]___[hash:base64:5]',
+              },
+              importLoaders: 2,
+            },
+          },
           'sass-loader',
         ],
       },
@@ -27,7 +36,8 @@ module.exports = {
   },
   plugins: [
     new MiniCssExtractPlugin({
-      filename: 'styles.css',
+      filename: '[name].css',
+      chunkFilename: '[id].css',
     }),
   ],
   optimization: {
@@ -36,13 +46,10 @@ module.exports = {
   output: {
     path: path.join(__dirname, 'dist'),
     filename: 'bundle.js',
-    library: 'google-material-charts',
-    libraryTarget: 'umd',
     globalObject: 'this',
-    // library: {
-    //   name: 'google-material-charts',
-    //   type: 'umd',
-    //   export: 'default'
-    // },
+    library: {
+      name: 'google-material-charts',
+      type: 'umd',
+    },
   },
 };
