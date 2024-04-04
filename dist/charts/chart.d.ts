@@ -8,6 +8,7 @@ export declare abstract class Chart<TData, TConfig extends ChartConfig> {
     protected legend: HTMLDivElement;
     protected bubble?: HTMLDivElement;
     protected constructor(parent: HTMLDivElement, title: string, data: TData, maxValue: number, configs: TConfig[]);
+    protected generateSvg(data: TData, maxValue: number, configs: TConfig[], fontSize: number): void;
     protected abstract renderSvg(data: TData, maxValue: number, configs: TConfig[], fontSize: number): void;
     protected abstract renderLegend(data: TData, configs: TConfig[]): void;
     protected makeBubble(): void;

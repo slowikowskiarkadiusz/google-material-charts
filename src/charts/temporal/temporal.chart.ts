@@ -20,6 +20,18 @@ export abstract class TemporalChart<TData extends TemporalData, TConfig extends 
     this.svg.append(this.horizontalLinesGroup);
     const longestValueLength = data.items.flatMap(x => x.values).reduce((p, c) => p > c ? p : c).toString().length;
     const horizontalLinesCount = 4;
+
+    const horizontalLinesLabels: SVGTextElement[] = [];
+    for (let i = 0; i <= horizontalLinesCount; i++) {
+      const text = this.parent.ownerDocument.createElementNS(Chart.svgNS, 'text');
+      const textPath = this.parent.ownerDocument.createElementNS(Chart.svgNS, 'textPath');
+      textPath.classList.add(lineStyles.horizontalLineLabel);
+      textPath.innerHTML = `${ Math.floor(maxValue - maxValue * (i) / 4) }`;
+      text.append(textPath);
+      this.svg.append(text);
+      horizontalLinesLabels.push(text);
+    }
+
     for (let i = 0; i <= horizontalLinesCount; i++) {
       const line = this.parent.ownerDocument.createElementNS(Chart.svgNS, 'line');
       line.setAttribute('x1', `${ 0 }`);
@@ -55,19 +67,6 @@ export abstract class TemporalChart<TData extends TemporalData, TConfig extends 
     horizontalLinesLabelsGroup.classList.add(lineStyles.group);
 
     const valuesPolygonsGroup = this.parent.ownerDocument.createElementNS(Chart.svgNS, 'g');
-    // const polygonsData = makePolygons(data.items, this.horizontalLinesGroup.getBBox().width, this.horizontalLinesGroup.getBBox().height, 0, data.items.flatMap(x => x.values).reduce((p, c) => p > c ? p : c), 0);
-    // polygonsData
-    //   .forEach((x, i) => {
-    //     const path = this.parent.ownerDocument.createElementNS(Chart.svgNS, 'path');
-    //     path.setAttribute('d', x.path);
-    //     path.setAttribute('stroke', configs[i].color);
-    //     if (configs[i].isDotted)
-    //       path.setAttribute('stroke-dasharray', '7');
-    //     path.setAttribute('stroke-width', '2');
-    //     path.setAttribute('fill', 'none');
-    //     valuesPolygonsGroup.append(path);
-    //   });
-    // this.vertices = polygonsData.map(x => x.vertices.map(y => new v2d(y.x, y.y)));
 
     this.svg.append(valuesPolygonsGroup);
     valuesPolygonsGroup.classList.add(lineStyles.group);
@@ -75,7 +74,7 @@ export abstract class TemporalChart<TData extends TemporalData, TConfig extends 
     const { width, height } = this.horizontalLinesGroup.getBBox();
     this.verticalLines = makeVerticalLines(data, width, height);
 
-    this.putAllLabels(data, scaledHeight, fontSize, clientWidth, longestValueLength);
+    this.putAllBottomLabels(data, scaledHeight, fontSize, clientWidth, longestValueLength);
 
     this.renderTemporalSvg(data, maxValue, configs, fontSize);
   }
@@ -120,7 +119,7 @@ export abstract class TemporalChart<TData extends TemporalData, TConfig extends 
     });
   }
 
-  private putAllLabels(data: TData, scaledHeight: number, fontSize: number, clientWidth: number, longestValueLength: number) {
+  private putAllBottomLabels(data: TData, scaledHeight: number, fontSize: number, clientWidth: number, longestValueLength: number) {
     const leftText = this.parent.ownerDocument.createElementNS(Chart.svgNS, 'text');
     leftText.textContent = data.dates[0];
     leftText.classList.add(lineStyles.horizontalLineLabel);

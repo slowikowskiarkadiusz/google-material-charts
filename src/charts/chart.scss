@@ -1,20 +1,24 @@
 $lightFontColor: rgb(97, 97, 97);
 $lightBorderColor: rgb(224, 224, 224);
+$changeWithColorScheme: false;
 
 .chart {
-    //@media (prefers-color-scheme: dark) {
-    //    color: $lightBorderColor;
-    //    border: 1px $lightFontColor solid;
+    //@media (prefers-color-scheme: light) {
+    color: $lightFontColor;
+    border: 1px $lightBorderColor solid;
     //}
-    @media (prefers-color-scheme: light) {
-        color: $lightFontColor;
-        border: 1px $lightBorderColor solid;
+
+    &.change-with-color-scheme {
+        @media (prefers-color-scheme: dark) {
+            color: $lightBorderColor;
+            border: 1px $lightFontColor solid;
+        }
     }
 
     display: grid;
     grid-template-rows: min-content auto min-content;
     height: 100%;
-    width: 100%;
+    max-width: 100%;
     font-family: "Roboto", serif;
     padding: 1em;
     gap: 1em;
@@ -37,14 +41,17 @@ $lightBorderColor: rgb(224, 224, 224);
     }
 
     .bubble {
-        @media (prefers-color-scheme: light) {
-            background-color: white;
-            color: $lightFontColor;
-        }
-        //@media (prefers-color-scheme: dark) {
-        //    background-color: #282828;
-        //    color: $lightBorderColor;
+        //@media (prefers-color-scheme: light) {
+        background-color: white;
+        color: $lightFontColor;
         //}
+
+        .change-with-color-scheme & {
+            @media (prefers-color-scheme: dark) {
+                background-color: #282828;
+                color: $lightBorderColor;
+            }
+        }
 
         pointer-events: none;
         position: absolute;
@@ -57,12 +64,14 @@ $lightBorderColor: rgb(224, 224, 224);
     }
 
     .bubble::after {
-        @media (prefers-color-scheme: light) {
-            border-top: 10px solid white;
-        }
-        //@media (prefers-color-scheme: dark) {
-        //    border-top: 10px solid #282828;
+        //@media (prefers-color-scheme: light) {
+        border-top: 10px solid white;
         //}
+        @if $changeWithColorScheme {
+            @media (prefers-color-scheme: dark) {
+                border-top: 10px solid #282828;
+            }
+        }
         content: "";
         position: absolute;
         width: 0;

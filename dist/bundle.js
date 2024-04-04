@@ -27,10 +27,11 @@ return /******/ (() => { // webpackBootstrap
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, `.chart__chart___f4ctQ{display:grid;grid-template-rows:min-content auto min-content;height:100%;width:100%;font-family:"Roboto",serif;padding:1em;gap:1em;background-color:#fff}@media(prefers-color-scheme: light){.chart__chart___f4ctQ{color:#616161;border:1px #e0e0e0 solid}}.chart__chart___f4ctQ .chart__chartHeader___orL0U{margin:0;font-size:1.25em;font-weight:normal}.chart__chart___f4ctQ .chart__chartContent___kMqHX{width:100%;height:100%}.chart__chart___f4ctQ .chart__chartLegend___ZcX1i{height:min-content;min-height:min-content}.chart__chart___f4ctQ .chart__bubble___lfOZg{pointer-events:none;position:absolute;padding:1em;display:block;box-shadow:0 2px 10px 0px #b2b2b2;border-radius:.25em;transform-origin:bottom center}@media(prefers-color-scheme: light){.chart__chart___f4ctQ .chart__bubble___lfOZg{background-color:#fff;color:#616161}}.chart__chart___f4ctQ .chart__bubble___lfOZg::after{content:"";position:absolute;width:0;height:0;left:calc(50% - 10px);bottom:-10px;border-left:10px solid rgba(0,0,0,0);border-right:10px solid rgba(0,0,0,0);border-top:10px solid #fff}@media(prefers-color-scheme: light){.chart__chart___f4ctQ .chart__bubble___lfOZg::after{border-top:10px solid #fff}}`, ""]);
+___CSS_LOADER_EXPORT___.push([module.id, `.chart__chart___f4ctQ{color:#616161;border:1px #e0e0e0 solid;display:grid;grid-template-rows:min-content auto min-content;height:100%;max-width:100%;font-family:"Roboto",serif;padding:1em;gap:1em;background-color:#fff}@media(prefers-color-scheme: dark){.chart__chart___f4ctQ.chart__change-with-color-scheme___SMaGY{color:#e0e0e0;border:1px #616161 solid}}.chart__chart___f4ctQ .chart__chartHeader___orL0U{margin:0;font-size:1.25em;font-weight:normal}.chart__chart___f4ctQ .chart__chartContent___kMqHX{width:100%;height:100%}.chart__chart___f4ctQ .chart__chartLegend___ZcX1i{height:min-content;min-height:min-content}.chart__chart___f4ctQ .chart__bubble___lfOZg{background-color:#fff;color:#616161;pointer-events:none;position:absolute;padding:1em;display:block;box-shadow:0 2px 10px 0px #b2b2b2;border-radius:.25em;transform-origin:bottom center}@media(prefers-color-scheme: dark){.chart__change-with-color-scheme___SMaGY .chart__chart___f4ctQ .chart__bubble___lfOZg{background-color:#282828;color:#e0e0e0}}.chart__chart___f4ctQ .chart__bubble___lfOZg::after{border-top:10px solid #fff;content:"";position:absolute;width:0;height:0;left:calc(50% - 10px);bottom:-10px;border-left:10px solid rgba(0,0,0,0);border-right:10px solid rgba(0,0,0,0);border-top:10px solid #fff}`, ""]);
 // Exports
 ___CSS_LOADER_EXPORT___.locals = {
 	"chart": `chart__chart___f4ctQ`,
+	"change-with-color-scheme": `chart__change-with-color-scheme___SMaGY`,
 	"chartHeader": `chart__chartHeader___orL0U`,
 	"chartContent": `chart__chartContent___kMqHX`,
 	"chartLegend": `chart__chartLegend___ZcX1i`,
@@ -56,10 +57,11 @@ ___CSS_LOADER_EXPORT___.locals = {
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, `.line-chart__chart___c3Fz6{display:grid;grid-template-rows:min-content auto min-content;height:100%;width:100%;font-family:"Roboto",serif;padding:1em;gap:1em;background-color:#fff}@media(prefers-color-scheme: light){.line-chart__chart___c3Fz6{color:#616161;border:1px #e0e0e0 solid}}.line-chart__chart___c3Fz6 .line-chart__chartHeader___nPl_H{margin:0;font-size:1.25em;font-weight:normal}.line-chart__chart___c3Fz6 .line-chart__chartContent___iIfSt{width:100%;height:100%}.line-chart__chart___c3Fz6 .line-chart__chartLegend___Q1IYW{height:min-content;min-height:min-content}.line-chart__chart___c3Fz6 .line-chart__bubble___ZnKTF{pointer-events:none;position:absolute;padding:1em;display:block;box-shadow:0 2px 10px 0px #b2b2b2;border-radius:.25em;transform-origin:bottom center}@media(prefers-color-scheme: light){.line-chart__chart___c3Fz6 .line-chart__bubble___ZnKTF{background-color:#fff;color:#616161}}.line-chart__chart___c3Fz6 .line-chart__bubble___ZnKTF::after{content:"";position:absolute;width:0;height:0;left:calc(50% - 10px);bottom:-10px;border-left:10px solid rgba(0,0,0,0);border-right:10px solid rgba(0,0,0,0);border-top:10px solid #fff}@media(prefers-color-scheme: light){.line-chart__chart___c3Fz6 .line-chart__bubble___ZnKTF::after{border-top:10px solid #fff}}.line-chart__horizontalLine___WW3Rl,.line-chart__bottomHorizontalLine___uHUiN{stroke-width:1}@media(prefers-color-scheme: light){.line-chart__horizontalLine___WW3Rl,.line-chart__bottomHorizontalLine___uHUiN{stroke:#e0e0e0}}.line-chart__verticalLine___ReBsq{stroke-width:1;stroke-dasharray:2}@media(prefers-color-scheme: light){.line-chart__verticalLine___ReBsq{stroke:#e0e0e0}}.line-chart__horizontalLineLabel___yX3fe{font-size:.75em}@media(prefers-color-scheme: light){.line-chart__horizontalLineLabel___yX3fe{fill:#616161}}.line-chart__bottomHorizontalLine___uHUiN{stroke-width:2}.line-chart__closestDot___BXxvr{stroke-width:2}@media(prefers-color-scheme: light){.line-chart__closestDot___BXxvr{fill:#fff}}.line-chart__group___KdjoR *{pointer-events:none}`, ""]);
+___CSS_LOADER_EXPORT___.push([module.id, `.line-chart__chart___c3Fz6{color:#616161;border:1px #e0e0e0 solid;display:grid;grid-template-rows:min-content auto min-content;height:100%;max-width:100%;font-family:"Roboto",serif;padding:1em;gap:1em;background-color:#fff}@media(prefers-color-scheme: dark){.line-chart__chart___c3Fz6.line-chart__change-with-color-scheme___lvSby{color:#e0e0e0;border:1px #616161 solid}}.line-chart__chart___c3Fz6 .line-chart__chartHeader___nPl_H{margin:0;font-size:1.25em;font-weight:normal}.line-chart__chart___c3Fz6 .line-chart__chartContent___iIfSt{width:100%;height:100%}.line-chart__chart___c3Fz6 .line-chart__chartLegend___Q1IYW{height:min-content;min-height:min-content}.line-chart__chart___c3Fz6 .line-chart__bubble___ZnKTF{background-color:#fff;color:#616161;pointer-events:none;position:absolute;padding:1em;display:block;box-shadow:0 2px 10px 0px #b2b2b2;border-radius:.25em;transform-origin:bottom center}@media(prefers-color-scheme: dark){.line-chart__change-with-color-scheme___lvSby .line-chart__chart___c3Fz6 .line-chart__bubble___ZnKTF{background-color:#282828;color:#e0e0e0}}.line-chart__chart___c3Fz6 .line-chart__bubble___ZnKTF::after{border-top:10px solid #fff;content:"";position:absolute;width:0;height:0;left:calc(50% - 10px);bottom:-10px;border-left:10px solid rgba(0,0,0,0);border-right:10px solid rgba(0,0,0,0);border-top:10px solid #fff}.line-chart__horizontalLine___WW3Rl,.line-chart__bottomHorizontalLine___uHUiN{stroke-width:1}@media(prefers-color-scheme: light){.line-chart__horizontalLine___WW3Rl,.line-chart__bottomHorizontalLine___uHUiN{stroke:#e0e0e0}}.line-chart__verticalLine___ReBsq{stroke-width:1;stroke-dasharray:2}@media(prefers-color-scheme: light){.line-chart__verticalLine___ReBsq{stroke:#e0e0e0}}.line-chart__horizontalLineLabel___yX3fe{font-size:.75em}@media(prefers-color-scheme: light){.line-chart__horizontalLineLabel___yX3fe{fill:#616161}}.line-chart__bottomHorizontalLine___uHUiN{stroke-width:2}.line-chart__closestDot___BXxvr{stroke-width:2}@media(prefers-color-scheme: light){.line-chart__closestDot___BXxvr{fill:#fff}}.line-chart__group___KdjoR *{pointer-events:none}`, ""]);
 // Exports
 ___CSS_LOADER_EXPORT___.locals = {
 	"chart": `line-chart__chart___c3Fz6`,
+	"change-with-color-scheme": `line-chart__change-with-color-scheme___lvSby`,
 	"chartHeader": `line-chart__chartHeader___nPl_H`,
 	"chartContent": `line-chart__chartContent___iIfSt`,
 	"chartLegend": `line-chart__chartLegend___Q1IYW`,
@@ -613,15 +615,18 @@ class Chart {
         setTimeout(() => {
             const fontSize = parseInt(this.svg.computedStyleMap().get('font-size').toString().replace('px', ''));
             this.renderLegend(data, configs);
-            this.renderSvg(data, maxValue, configs, fontSize);
-            this.svg.classList.remove(charts_chart.chartContent);
-            this.svg.style.overflow = 'visible';
+            this.generateSvg(data, maxValue, configs, fontSize);
             window.addEventListener('resize', e => {
-                console.log('resize');
-                // this.svg.innerHTML = '';
-                // this.renderSvg(data, maxValue, configs, fontSize);
+                this.svg.classList.add(charts_chart.chartContent);
+                setTimeout(() => this.generateSvg(data, maxValue, configs, fontSize));
             });
         });
+    }
+    generateSvg(data, maxValue, configs, fontSize) {
+        this.svg.innerHTML = '';
+        this.renderSvg(data, maxValue, configs, fontSize);
+        this.svg.classList.remove(charts_chart.chartContent);
+        this.svg.style.overflow = 'visible';
     }
     makeBubble() {
         this.bubble?.remove();
@@ -658,6 +663,16 @@ class TemporalChart extends Chart {
         this.svg.append(this.horizontalLinesGroup);
         const longestValueLength = data.items.flatMap(x => x.values).reduce((p, c) => p > c ? p : c).toString().length;
         const horizontalLinesCount = 4;
+        const horizontalLinesLabels = [];
+        for (let i = 0; i <= horizontalLinesCount; i++) {
+            const text = this.parent.ownerDocument.createElementNS(Chart.svgNS, 'text');
+            const textPath = this.parent.ownerDocument.createElementNS(Chart.svgNS, 'textPath');
+            textPath.classList.add(line_line_chart.horizontalLineLabel);
+            textPath.innerHTML = `${Math.floor(maxValue - maxValue * (i) / 4)}`;
+            text.append(textPath);
+            this.svg.append(text);
+            horizontalLinesLabels.push(text);
+        }
         for (let i = 0; i <= horizontalLinesCount; i++) {
             const line = this.parent.ownerDocument.createElementNS(Chart.svgNS, 'line');
             line.setAttribute('x1', `${0}`);
@@ -689,24 +704,11 @@ class TemporalChart extends Chart {
         horizontalLinesLabelsGroup.setAttribute('transform', `translate(0, ${fontSize / 3})`);
         horizontalLinesLabelsGroup.classList.add(line_line_chart.group);
         const valuesPolygonsGroup = this.parent.ownerDocument.createElementNS(Chart.svgNS, 'g');
-        // const polygonsData = makePolygons(data.items, this.horizontalLinesGroup.getBBox().width, this.horizontalLinesGroup.getBBox().height, 0, data.items.flatMap(x => x.values).reduce((p, c) => p > c ? p : c), 0);
-        // polygonsData
-        //   .forEach((x, i) => {
-        //     const path = this.parent.ownerDocument.createElementNS(Chart.svgNS, 'path');
-        //     path.setAttribute('d', x.path);
-        //     path.setAttribute('stroke', configs[i].color);
-        //     if (configs[i].isDotted)
-        //       path.setAttribute('stroke-dasharray', '7');
-        //     path.setAttribute('stroke-width', '2');
-        //     path.setAttribute('fill', 'none');
-        //     valuesPolygonsGroup.append(path);
-        //   });
-        // this.vertices = polygonsData.map(x => x.vertices.map(y => new v2d(y.x, y.y)));
         this.svg.append(valuesPolygonsGroup);
         valuesPolygonsGroup.classList.add(line_line_chart.group);
         const { width, height } = this.horizontalLinesGroup.getBBox();
         this.verticalLines = makeVerticalLines(data, width, height);
-        this.putAllLabels(data, scaledHeight, fontSize, clientWidth, longestValueLength);
+        this.putAllBottomLabels(data, scaledHeight, fontSize, clientWidth, longestValueLength);
         this.renderTemporalSvg(data, maxValue, configs, fontSize);
     }
     renderLegend(data, configs) {
@@ -744,7 +746,7 @@ class TemporalChart extends Chart {
             main.append(label);
         });
     }
-    putAllLabels(data, scaledHeight, fontSize, clientWidth, longestValueLength) {
+    putAllBottomLabels(data, scaledHeight, fontSize, clientWidth, longestValueLength) {
         const leftText = this.parent.ownerDocument.createElementNS(Chart.svgNS, 'text');
         leftText.textContent = data.dates[0];
         leftText.classList.add(line_line_chart.horizontalLineLabel);
@@ -921,10 +923,10 @@ class v2d {
 const defaultConfigs = [
     { color: '#E40303', isDotted: false },
     { color: '#FF8C00', isDotted: false },
-    { color: '#FFED00', isDotted: false },
     { color: '#008026', isDotted: false },
     { color: '#24408E', isDotted: false },
     { color: '#732982', isDotted: false },
+    { color: '#FFED00', isDotted: false },
 ];
 const vertexDotRadius = '4';
 const closestVertexDotRadius = '6';

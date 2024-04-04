@@ -44,24 +44,11 @@ export class TemporalChart extends Chart {
         horizontalLinesLabelsGroup.setAttribute('transform', `translate(0, ${fontSize / 3})`);
         horizontalLinesLabelsGroup.classList.add(lineStyles.group);
         const valuesPolygonsGroup = this.parent.ownerDocument.createElementNS(Chart.svgNS, 'g');
-        // const polygonsData = makePolygons(data.items, this.horizontalLinesGroup.getBBox().width, this.horizontalLinesGroup.getBBox().height, 0, data.items.flatMap(x => x.values).reduce((p, c) => p > c ? p : c), 0);
-        // polygonsData
-        //   .forEach((x, i) => {
-        //     const path = this.parent.ownerDocument.createElementNS(Chart.svgNS, 'path');
-        //     path.setAttribute('d', x.path);
-        //     path.setAttribute('stroke', configs[i].color);
-        //     if (configs[i].isDotted)
-        //       path.setAttribute('stroke-dasharray', '7');
-        //     path.setAttribute('stroke-width', '2');
-        //     path.setAttribute('fill', 'none');
-        //     valuesPolygonsGroup.append(path);
-        //   });
-        // this.vertices = polygonsData.map(x => x.vertices.map(y => new v2d(y.x, y.y)));
         this.svg.append(valuesPolygonsGroup);
         valuesPolygonsGroup.classList.add(lineStyles.group);
         const { width, height } = this.horizontalLinesGroup.getBBox();
         this.verticalLines = makeVerticalLines(data, width, height);
-        this.putAllLabels(data, scaledHeight, fontSize, clientWidth, longestValueLength);
+        this.putAllBottomLabels(data, scaledHeight, fontSize, clientWidth, longestValueLength);
         this.renderTemporalSvg(data, maxValue, configs, fontSize);
     }
     renderLegend(data, configs) {
@@ -99,7 +86,7 @@ export class TemporalChart extends Chart {
             main.append(label);
         });
     }
-    putAllLabels(data, scaledHeight, fontSize, clientWidth, longestValueLength) {
+    putAllBottomLabels(data, scaledHeight, fontSize, clientWidth, longestValueLength) {
         const leftText = this.parent.ownerDocument.createElementNS(Chart.svgNS, 'text');
         leftText.textContent = data.dates[0];
         leftText.classList.add(lineStyles.horizontalLineLabel);

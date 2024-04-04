@@ -7,7 +7,7 @@ export declare abstract class TemporalChart<TData extends TemporalData, TConfig 
     protected renderSvg(data: TData, maxValue: number, configs: TConfig[], fontSize: number): void;
     protected abstract renderTemporalSvg(data: TData, maxValue: number, configs: TConfig[], fontSize: number): void;
     protected renderLegend(data: TemporalData, configs: TConfig[]): void;
-    private putAllLabels;
+    private putAllBottomLabels;
     private putLabelsSubsequently;
     private isTextOverlapping;
 }

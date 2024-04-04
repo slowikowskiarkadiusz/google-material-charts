@@ -5,10 +5,10 @@ import { Chart } from "../../chart";
 export const defaultConfigs = [
     { color: '#E40303', isDotted: false },
     { color: '#FF8C00', isDotted: false },
-    { color: '#FFED00', isDotted: false },
     { color: '#008026', isDotted: false },
     { color: '#24408E', isDotted: false },
     { color: '#732982', isDotted: false },
+    { color: '#FFED00', isDotted: false },
 ];
 const vertexDotRadius = '4';
 const closestVertexDotRadius = '6';
